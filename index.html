@@ -1,0 +1,432 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Volume2, Star, CheckCircle, XCircle, Trophy, BookOpen, Brain, LogOut, Send, AlertCircle } from 'lucide-react';
+
+// --- 資料設定 (請勿更動單字列表) ---
+const VOCABULARY = {
+  1: [
+    { word: 'afraid', zh: '害怕的', type: 'emotion', hint: '🙈 看到鬼會覺得...', icon: '😱' },
+    { word: 'fresh', zh: '新鮮的', type: 'state', hint: '🥦 剛採摘的蔬菜', icon: '🥗' },
+    { word: 'strange', zh: '奇怪的', type: 'state', hint: '👽 外星人看起來很...', icon: '❓' },
+    { word: 'unhealthy', zh: '不健康的', type: 'state', hint: '🍔 每天吃炸雞是...', icon: '🤒' },
+    { word: 'clever', zh: '聰明的', type: 'personality', hint: '💡 很快想到辦法', icon: '🧠' },
+    { word: 'honest', zh: '誠實的', type: 'personality', hint: '🤥 皮諾丘相反詞', icon: '🤝' },
+    { word: 'incorrect', zh: '不正確的', type: 'state', hint: '❌ 考卷打叉叉', icon: '❌' },
+    { word: 'dangerous', zh: '危險的', type: 'state', hint: '⚠️ 獅子靠近了！', icon: '🦁' },
+    { word: 'beautiful', zh: '美麗的', type: 'appearance', hint: '🌹 像花一樣', icon: '💃' },
+    { word: 'handsome', zh: '英俊的', type: 'appearance', hint: '🤵 穿西裝的帥哥', icon: '😎' },
+  ],
+  2: [
+    { word: 'vacation', zh: '假期', type: 'noun', hint: '🏖️ 不用上學的日子', icon: '✈️' },
+    { word: 'machine', zh: '機器', type: 'noun', hint: '🤖 機器人也是一種...', icon: '⚙️' },
+    { word: 'engineer', zh: '工程師', type: 'job', hint: '👷 設計機器的人', icon: '💻' },
+    { word: 'businesswoman', zh: '女商人', type: 'job', hint: '💼 在公司上班的女生', icon: '👩‍💼' },
+    { word: 'surprised', zh: '驚訝的', type: 'emotion', hint: '🎁 收到意外禮物', icon: '😲' },
+    { word: 'helpful', zh: '有幫助的', type: 'personality', hint: '🤝 樂於助人', icon: '🦸' },
+    { word: 'important', zh: '重要的', type: 'state', hint: '⭐ 考試必考題', icon: '❗' },
+    { word: 'special', zh: '特別的', type: 'state', hint: '🌟 獨一無二', icon: '✨' },
+    { word: 'enough', zh: '足夠的', type: 'state', hint: '🍽️ 吃飽了，不用再多了', icon: '👌' },
+    { word: 'excellent', zh: '優秀的', type: 'state', hint: '💯 考了一百分', icon: '👍' },
+  ],
+  3: [
+    { word: 'celebrate', zh: '慶祝', type: 'verb', hint: '🎂 生日要切蛋糕', icon: '🎉' },
+    { word: 'medicine', zh: '藥', type: 'noun', hint: '💊 生病要吃...', icon: '🏥' },
+    { word: 'refrigerator', zh: '冰箱', type: 'noun', hint: '🧊 保存食物的地方', icon: '🥶' },
+    { word: 'dictionary', zh: '字典', type: 'noun', hint: '📖 查單字的書', icon: '📚' },
+    { word: 'believe', zh: '相信', type: 'verb', hint: '🙏 I believe I can fly', icon: '🤞' },
+    { word: 'address', zh: '地址', type: 'noun', hint: '🏠 你家住在哪裡？', icon: '📮' },
+    { word: 'weight', zh: '重量', type: 'measure', hint: '⚖️ 站上體重計', icon: '🐘' },
+    { word: 'height', zh: '高度', type: 'measure', hint: '📏 量身高', icon: '🦒' },
+    { word: 'centimeter', zh: '公分', type: 'unit', hint: '📏 尺上面的小格子 (cm)', icon: '🤏' },
+    { word: 'kilogram', zh: '公斤', type: 'unit', hint: '🏋️ 大象很重 (kg)', icon: '⚖️' },
+  ]
+};
+
+// --- Google Apps Script URL (請使用者替換成自己的) ---
+// 如果未替換，會有模擬的成功訊息
+const GOOGLE_SCRIPT_URL = ""; 
+
+export default function App() {
+  const [user, setUser] = useState(null); // { name }
+  const [view, setView] = useState('login'); // login, menu, learn, game, result
+  const [week, setWeek] = useState(1);
+  const [gameMode, setGameMode] = useState('quiz'); // quiz, sort
+  
+  // 遊戲狀態
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [questions, setQuestions] = useState([]);
+  const [feedback, setFeedback] = useState(null); // 'correct', 'wrong'
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 語音合成
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.8; // 稍微慢一點適合小學生
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // --- 登入頁面 ---
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    setUser({
+      name: formData.get('name'),
+    });
+    setView('menu');
+  };
+
+  // --- 數據上傳 ---
+  const logDataToSheet = async (resultData) => {
+    if (!GOOGLE_SCRIPT_URL) {
+      console.log("模擬上傳數據:", resultData);
+      return;
+    }
+    
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', // 重要：避免 CORS 問題
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(resultData)
+      });
+      console.log("數據已發送");
+    } catch (error) {
+      console.error("上傳失敗", error);
+    }
+  };
+
+  // --- 遊戲邏輯 ---
+  const startGame = (selectedWeek, mode) => {
+    setWeek(selectedWeek);
+    setGameMode(mode);
+    setScore(0);
+    setCurrentQIndex(0);
+    setFeedback(null);
+    
+    const words = VOCABULARY[selectedWeek];
+    let qList = [];
+
+    if (mode === 'quiz') {
+      // 混合題型：聽音選字、看英選中
+      qList = words.map(word => {
+        const isListening = Math.random() > 0.5;
+        // 產生 3 個錯誤選項
+        const others = words.filter(w => w.word !== word.word);
+        const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [...distractors, word].sort(() => 0.5 - Math.random());
+        
+        return {
+          type: isListening ? 'listening' : 'meaning',
+          target: word,
+          options: options
+        };
+      });
+    } else if (mode === 'sort') {
+      // 分類題：判斷詞性或特徵 (簡化為兩類或多類選擇)
+      // 這裡做一個簡單的分類玩法：根據 hint 或 type 來選
+      // 為了簡單有趣，我們做 "配對題" 變體 -> 英文 配 圖示/中文
+      qList = words.map(word => {
+         const others = words.filter(w => w.word !== word.word);
+         const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+         const options = [...distractors, word].sort(() => 0.5 - Math.random());
+         return {
+           type: 'matching',
+           target: word,
+           options: options
+         };
+      });
+    }
+
+    // 隨機打亂題目順序
+    setQuestions(qList.sort(() => 0.5 - Math.random()));
+    setView('game');
+  };
+
+  const handleAnswer = (option) => {
+    const currentQ = questions[currentQIndex];
+    const isCorrect = option.word === currentQ.target.word;
+    
+    if (isCorrect) {
+      setScore(s => s + 10);
+      setFeedback('correct');
+      // 答對音效 (可選)
+      speak("Good job!");
+    } else {
+      setFeedback('wrong');
+      speak("Try again.");
+    }
+
+    // 記錄每一題 (實際應用可改為累積一次發送)
+    logDataToSheet({
+      timestamp: new Date().toISOString(),
+      name: user.name,
+      week: week,
+      word: currentQ.target.word,
+      type: currentQ.type,
+      isCorrect: isCorrect,
+      score: isCorrect ? 10 : 0
+    });
+
+    // 延遲進入下一題
+    setTimeout(() => {
+      setFeedback(null);
+      if (currentQIndex < questions.length - 1) {
+        setCurrentQIndex(prev => prev + 1);
+      } else {
+        setView('result');
+      }
+    }, 1500);
+  };
+
+  // --- 畫面渲染組件 ---
+
+  // 1. 登入畫面
+  if (view === 'login') {
+    return (
+      <div className="min-h-screen bg-yellow-100 flex items-center justify-center p-4 font-sans">
+        <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border-b-8 border-yellow-400">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-blue-600 mb-2">🎈 芝麻街英文挑戰</h1>
+            <p className="text-gray-500">Are you ready?</p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-gray-700 font-bold mb-1">姓名 Name</label>
+              <input type="text" name="name" required className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200" placeholder="王小明" />
+            </div>
+            <button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition text-xl mt-6">
+              開始 Start! 🚀
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. 主選單
+  if (view === 'menu') {
+    return (
+      <div className="min-h-screen bg-blue-50 p-4 font-sans">
+        <div className="max-w-4xl mx-auto">
+          <header className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">Hi, {user.name} 👋</h2>
+              <p className="text-gray-500">今天想練習哪一週？</p>
+            </div>
+            <button onClick={() => setView('login')} className="text-red-400 hover:bg-red-50 p-2 rounded-lg">
+              <LogOut size={24} />
+            </button>
+          </header>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {[1, 2, 3].map(w => (
+              <button 
+                key={w}
+                onClick={() => setWeek(w)}
+                className={`p-6 rounded-3xl border-b-8 transition transform active:scale-95 text-left relative overflow-hidden ${
+                  week === w ? 'bg-yellow-400 border-yellow-600 ring-4 ring-yellow-200' : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
+                }`}
+              >
+                <div className="relative z-10">
+                  <span className="text-sm font-bold uppercase tracking-wider opacity-70">Week</span>
+                  <div className="text-4xl font-black">{w}</div>
+                </div>
+                {week === w && <CheckCircle className="absolute top-4 right-4 text-white opacity-50" size={48} />}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div onClick={() => setView('learn')} className="cursor-pointer group bg-white p-6 rounded-3xl shadow-sm border-2 border-transparent hover:border-green-400 transition">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-green-100 text-green-600 rounded-2xl">
+                  <BookOpen size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">單字學習 Learn</h3>
+                  <p className="text-gray-500 text-sm">發音、聯想、記憶卡</p>
+                </div>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-green-400 w-2/3"></div>
+              </div>
+            </div>
+
+            <div onClick={() => startGame(week, 'quiz')} className="cursor-pointer group bg-white p-6 rounded-3xl shadow-sm border-2 border-transparent hover:border-purple-400 transition">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 bg-purple-100 text-purple-600 rounded-2xl">
+                  <Trophy size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">闖關挑戰 Game</h3>
+                  <p className="text-gray-500 text-sm">聽力、配對、拿高分</p>
+                </div>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-purple-400 w-1/3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. 學習模式
+  if (view === 'learn') {
+    const words = VOCABULARY[week];
+    return (
+      <div className="min-h-screen bg-green-50 p-4 flex flex-col items-center">
+        <header className="w-full max-w-2xl flex justify-between items-center mb-6">
+          <button onClick={() => setView('menu')} className="text-gray-500 font-bold hover:text-gray-700">← Back</button>
+          <div className="font-bold text-green-700 bg-green-200 px-4 py-1 rounded-full">Week {week} Words</div>
+        </header>
+
+        <div className="w-full max-w-2xl grid gap-4 pb-20">
+          {words.map((item, idx) => (
+            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm flex items-center justify-between border-b-4 border-gray-100 hover:border-green-300 transition">
+              <div className="flex items-center gap-4">
+                <div className="text-4xl bg-gray-50 p-3 rounded-xl">{item.icon}</div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800">{item.word}</h3>
+                  <p className="text-gray-500 font-medium">{item.zh}</p>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                 <button 
+                  onClick={() => speak(item.word)} 
+                  className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full transition"
+                >
+                  <Volume2 size={24} />
+                </button>
+                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md">{item.hint}</span>
+              </div>
+             
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // 4. 遊戲/測驗模式
+  if (view === 'game') {
+    const currentQ = questions[currentQIndex];
+    
+    // 計算進度
+    const progress = ((currentQIndex) / questions.length) * 100;
+
+    return (
+      <div className="min-h-screen bg-purple-50 p-4 flex flex-col items-center justify-center font-sans">
+         <div className="w-full max-w-xl mb-8">
+           <div className="flex justify-between text-gray-600 font-bold mb-2">
+             <span>Question {currentQIndex + 1}/{questions.length}</span>
+             <span>Score: {score}</span>
+           </div>
+           <div className="h-4 bg-white rounded-full overflow-hidden shadow-inner">
+             <div className="h-full bg-purple-500 transition-all duration-500" style={{ width: `${progress}%` }}></div>
+           </div>
+         </div>
+
+         <div className="bg-white rounded-3xl shadow-xl w-full max-w-xl p-8 text-center relative border-b-8 border-purple-200">
+            {/* 題目區 */}
+            <div className="mb-8">
+              {currentQ.type === 'listening' ? (
+                 <div className="py-8">
+                   <button 
+                    onClick={() => speak(currentQ.target.word)} 
+                    className="bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-full shadow-lg animate-bounce"
+                   >
+                     <Volume2 size={48} />
+                   </button>
+                   <p className="mt-4 text-gray-500">點擊播放聲音</p>
+                 </div>
+              ) : (
+                <div className="py-8">
+                   <div className="text-5xl font-black text-gray-800 mb-2">{currentQ.target.word}</div>
+                   <div className="text-gray-400 text-sm bg-gray-100 inline-block px-3 py-1 rounded-full">
+                     {currentQ.target.icon} {currentQ.target.type}
+                   </div>
+                </div>
+              )}
+            </div>
+
+            {/* 選項區 */}
+            <div className="grid grid-cols-2 gap-4">
+              {currentQ.options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  disabled={feedback !== null}
+                  onClick={() => handleAnswer(opt)}
+                  className={`p-4 rounded-xl text-lg font-bold border-b-4 transition transform active:scale-95 ${
+                    feedback === 'correct' && opt.word === currentQ.target.word 
+                      ? 'bg-green-500 border-green-700 text-white' 
+                      : feedback === 'wrong' && opt.word === currentQ.target.word
+                        ? 'bg-green-100 border-green-300 text-green-800' // Show correct answer if wrong
+                        : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-purple-50 hover:border-purple-200'
+                  }`}
+                >
+                  {currentQ.type === 'listening' ? opt.zh : opt.zh}
+                  <div className="text-xs opacity-50 font-normal mt-1">{opt.word}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* 回饋遮罩 */}
+            {feedback && (
+              <div className="absolute inset-0 rounded-3xl bg-white/90 backdrop-blur-sm flex items-center justify-center flex-col z-20">
+                 {feedback === 'correct' ? (
+                   <>
+                    <CheckCircle size={80} className="text-green-500 mb-4" />
+                    <h2 className="text-3xl font-black text-green-600">Correct! 🎉</h2>
+                   </>
+                 ) : (
+                   <>
+                    <XCircle size={80} className="text-red-500 mb-4" />
+                    <h2 className="text-3xl font-black text-red-600">Oops! 😅</h2>
+                    <p className="text-gray-500 mt-2">答案是：{currentQ.target.zh}</p>
+                   </>
+                 )}
+              </div>
+            )}
+         </div>
+      </div>
+    );
+  }
+
+  // 5. 結算畫面
+  if (view === 'result') {
+    const isPass = score >= 60;
+    return (
+      <div className="min-h-screen bg-yellow-400 p-4 flex flex-col items-center justify-center font-sans">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
+          <div className="mb-6 flex justify-center">
+             {isPass ? <Star size={80} className="text-yellow-400 fill-current animate-spin-slow" /> : <Brain size={80} className="text-gray-400" />}
+          </div>
+          
+          <h2 className="text-4xl font-black text-gray-800 mb-2">{isPass ? 'Awesome!' : 'Good Try!'}</h2>
+          <p className="text-gray-500 mb-8">Week {week} Challenge Complete</p>
+
+          <div className="bg-gray-50 rounded-2xl p-6 mb-8">
+            <div className="text-sm text-gray-400 uppercase tracking-widest">Total Score</div>
+            <div className="text-6xl font-black text-blue-600">{score}</div>
+          </div>
+
+          <button 
+            onClick={() => setView('menu')}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg border-b-4 border-blue-700 active:border-b-0 active:mt-1"
+          >
+            Play Again / Back to Menu
+          </button>
+          
+          <div className="mt-4 text-xs text-gray-400">
+            {GOOGLE_SCRIPT_URL ? "✅ 成績已上傳" : "⚠️ 未設定 Google Script URL (模擬模式)"}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <div>Loading...</div>;
+}
