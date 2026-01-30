@@ -105,13 +105,14 @@
         };
 
         // --- Google Apps Script URL ---
+        // 更新為使用者提供的新網址
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZXi__FLdmtn0OBcqnOxXunBWfglrOWaxDtMqzT_Ay3deCtexRIqAT1yULEUpoy9fb/exec";
 
         function App() {
             const [user, setUser] = useState(null); // { name }
             const [view, setView] = useState('login'); // login, menu, learn, game, result
             const [week, setWeek] = useState(1);
-            const [gameMode, setGameMode] = useState('quiz'); // quiz, sort
+            const [gameMode, setGameMode] = useState('quiz'); 
             
             // 遊戲狀態
             const [currentQIndex, setCurrentQIndex] = useState(0);
@@ -124,7 +125,7 @@
             const speak = (text) => {
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
-                utterance.rate = 0.8; // 稍微慢一點適合小學生
+                utterance.rate = 0.8;
                 window.speechSynthesis.speak(utterance);
             };
 
@@ -148,7 +149,7 @@
                 try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // 重要：避免 CORS 問題
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(resultData)
                 });
@@ -170,32 +171,41 @@
                 let qList = [];
 
                 if (mode === 'quiz') {
-                // 混合題型：聽音選字、看英選中
-                qList = words.map(word => {
-                    const isListening = Math.random() > 0.5;
-                    // 產生 3 個錯誤選項
-                    const others = words.filter(w => w.word !== word.word);
-                    const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
-                    const options = [...distractors, word].sort(() => 0.5 - Math.random());
-                    
-                    return {
-                    type: isListening ? 'listening' : 'meaning',
-                    target: word,
-                    options: options
-                    };
-                });
+                    // 混合題型：
+                    // 1. reading_en: 看英選中
+                    // 2. reading_zh: 看中選英
+                    // 3. listening:  聽音選中
+                    qList = words.map(word => {
+                        const rand = Math.random();
+                        let qType = 'listening';
+                        
+                        if (rand > 0.66) qType = 'reading_en'; // 33% 看英文選中文
+                        else if (rand > 0.33) qType = 'reading_zh'; // 33% 看中文選英文
+                        else qType = 'listening'; // 33% 聽力
+
+                        // 產生錯誤選項
+                        const others = words.filter(w => w.word !== word.word);
+                        const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+                        const options = [...distractors, word].sort(() => 0.5 - Math.random());
+                        
+                        return {
+                            type: qType,
+                            target: word,
+                            options: options
+                        };
+                    });
                 } else if (mode === 'sort') {
-                // 配對題型
-                qList = words.map(word => {
-                    const others = words.filter(w => w.word !== word.word);
-                    const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
-                    const options = [...distractors, word].sort(() => 0.5 - Math.random());
-                    return {
-                    type: 'matching',
-                    target: word,
-                    options: options
-                    };
-                });
+                    // 配對題型 (視為看英選中)
+                    qList = words.map(word => {
+                        const others = words.filter(w => w.word !== word.word);
+                        const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+                        const options = [...distractors, word].sort(() => 0.5 - Math.random());
+                        return {
+                            type: 'matching', // treated as reading_en logic for display
+                            target: word,
+                            options: options
+                        };
+                    });
                 }
 
                 // 隨機打亂題目順序
@@ -208,40 +218,37 @@
                 const isCorrect = option.word === currentQ.target.word;
                 
                 if (isCorrect) {
-                setScore(s => s + 10);
-                setFeedback('correct');
-                // 答對音效
-                speak("Good job!");
+                    setScore(s => s + 10);
+                    setFeedback('correct');
+                    speak("Good job!");
                 } else {
-                setFeedback('wrong');
-                speak("Try again.");
+                    setFeedback('wrong');
+                    speak("Try again.");
                 }
 
-                // 記錄每一題
                 logDataToSheet({
-                timestamp: new Date().toISOString(),
-                name: user.name,
-                week: week,
-                word: currentQ.target.word,
-                type: currentQ.type,
-                isCorrect: isCorrect,
-                score: isCorrect ? 10 : 0
+                    timestamp: new Date().toISOString(),
+                    name: user.name,
+                    week: week,
+                    word: currentQ.target.word,
+                    type: currentQ.type,
+                    isCorrect: isCorrect,
+                    score: isCorrect ? 10 : 0
                 });
 
-                // 延遲進入下一題
                 setTimeout(() => {
-                setFeedback(null);
-                if (currentQIndex < questions.length - 1) {
-                    setCurrentQIndex(prev => prev + 1);
-                } else {
-                    setView('result');
-                }
+                    setFeedback(null);
+                    if (currentQIndex < questions.length - 1) {
+                        setCurrentQIndex(prev => prev + 1);
+                    } else {
+                        setView('result');
+                    }
                 }, 1500);
             };
 
             // --- 畫面渲染組件 ---
+            // 登入、主選單、學習模式不變，直接跳到遊戲模式渲染
 
-            // 1. 登入畫面
             if (view === 'login') {
                 return (
                 <div className="min-h-screen bg-yellow-100 flex items-center justify-center p-4 font-sans">
@@ -264,7 +271,6 @@
                 );
             }
 
-            // 2. 主選單
             if (view === 'menu') {
                 return (
                 <div className="min-h-screen bg-blue-50 p-4 font-sans">
@@ -333,7 +339,6 @@
                 );
             }
 
-            // 3. 學習模式
             if (view === 'learn') {
                 const words = VOCABULARY[week];
                 return (
@@ -370,12 +375,13 @@
                 );
             }
 
-            // 4. 遊戲/測驗模式
+            // 4. 遊戲/測驗模式 (重點修改區域)
             if (view === 'game') {
                 const currentQ = questions[currentQIndex];
-                
-                // 計算進度
                 const progress = ((currentQIndex) / questions.length) * 100;
+                
+                // 判斷是否為「看中文選英文」模式
+                const isReadingZh = currentQ.type === 'reading_zh';
 
                 return (
                 <div className="min-h-screen bg-purple-50 p-4 flex flex-col items-center justify-center font-sans">
@@ -404,7 +410,10 @@
                             </div>
                         ) : (
                             <div className="py-8">
-                            <div className="text-5xl font-black text-gray-800 mb-2">{currentQ.target.word}</div>
+                            {/* 如果是 reading_zh (看中文選英文)，顯示中文 target.zh；否則顯示英文 target.word */}
+                            <div className="text-5xl font-black text-gray-800 mb-2">
+                                {isReadingZh ? currentQ.target.zh : currentQ.target.word}
+                            </div>
                             <div className="text-gray-400 text-sm bg-gray-100 inline-block px-3 py-1 rounded-full">
                                 {currentQ.target.icon} {currentQ.target.type}
                             </div>
@@ -419,7 +428,7 @@
                             key={idx}
                             disabled={feedback !== null}
                             onClick={() => handleAnswer(opt)}
-                            className={`p-4 rounded-xl text-lg font-bold border-b-4 transition transform active:scale-95 ${
+                            className={`p-4 rounded-xl text-lg font-bold border-b-4 transition transform active:scale-95 flex flex-col items-center justify-center min-h-[100px] ${
                                 feedback === 'correct' && opt.word === currentQ.target.word 
                                 ? 'bg-green-500 border-green-700 text-white' 
                                 : feedback === 'wrong' && opt.word === currentQ.target.word
@@ -427,8 +436,14 @@
                                     : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-purple-50 hover:border-purple-200'
                             }`}
                             >
-                            {currentQ.type === 'listening' ? opt.zh : opt.zh}
-                            <div className="text-xs opacity-50 font-normal mt-1">{opt.word}</div>
+                            {/* 重點修改：只顯示單一語言 */}
+                            {/* 如果題目是看中文 (reading_zh)，選項就只顯示英文 opt.word */}
+                            {/* 其他情況 (listening, reading_en)，選項只顯示中文 opt.zh */}
+                            <span className="text-xl">
+                                {isReadingZh ? opt.word : opt.zh}
+                            </span>
+                            
+                            {/* 移除原本下方的第二語言提示 */}
                             </button>
                         ))}
                         </div>
@@ -445,7 +460,9 @@
                             <>
                                 <XCircle size={80} className="text-red-500 mb-4" />
                                 <h2 className="text-3xl font-black text-red-600">Oops! 😅</h2>
-                                <p className="text-gray-500 mt-2">答案是：{currentQ.target.zh}</p>
+                                <p className="text-gray-500 mt-2 font-bold text-xl">
+                                    {currentQ.target.word} <br/> {currentQ.target.zh}
+                                </p>
                             </>
                             )}
                         </div>
@@ -455,7 +472,6 @@
                 );
             }
 
-            // 5. 結算畫面
             if (view === 'result') {
                 const isPass = score >= 60;
                 return (
