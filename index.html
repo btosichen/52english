@@ -63,49 +63,52 @@
         const LogOut = (props) => (
             <IconBase {...props}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></IconBase>
         );
+        const PlayCircle = (props) => (
+             <IconBase {...props}><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></IconBase>
+        );
 
-        // --- 資料設定 ---
+        // --- 資料設定 (新增 sentence 欄位) ---
         const VOCABULARY = {
             1: [
-                { word: 'afraid', zh: '害怕的', type: 'emotion', hint: '🙈 看到鬼會覺得...', icon: '😱' },
-                { word: 'fresh', zh: '新鮮的', type: 'state', hint: '🥦 剛採摘的蔬菜', icon: '🥗' },
-                { word: 'strange', zh: '奇怪的', type: 'state', hint: '👽 外星人看起來很...', icon: '❓' },
-                { word: 'unhealthy', zh: '不健康的', type: 'state', hint: '🍔 每天吃炸雞是...', icon: '🤒' },
-                { word: 'clever', zh: '聰明的', type: 'personality', hint: '💡 很快想到辦法', icon: '🧠' },
-                { word: 'honest', zh: '誠實的', type: 'personality', hint: '🤥 皮諾丘相反詞', icon: '🤝' },
-                { word: 'incorrect', zh: '不正確的', type: 'state', hint: '❌ 考卷打叉叉', icon: '❌' },
-                { word: 'dangerous', zh: '危險的', type: 'state', hint: '⚠️ 獅子靠近了！', icon: '🦁' },
-                { word: 'beautiful', zh: '美麗的', type: 'appearance', hint: '🌹 像花一樣', icon: '💃' },
-                { word: 'handsome', zh: '英俊的', type: 'appearance', hint: '🤵 穿西裝的帥哥', icon: '😎' },
+                { word: 'afraid', zh: '害怕的', type: 'emotion', hint: '🙈 看到鬼會覺得...', icon: '😱', sentence: 'I am afraid of ghosts.' },
+                { word: 'fresh', zh: '新鮮的', type: 'state', hint: '🥦 剛採摘的蔬菜', icon: '🥗', sentence: 'The apple is fresh.' },
+                { word: 'strange', zh: '奇怪的', type: 'state', hint: '👽 外星人看起來很...', icon: '❓', sentence: 'That is a strange sound.' },
+                { word: 'unhealthy', zh: '不健康的', type: 'state', hint: '🍔 每天吃炸雞是...', icon: '🤒', sentence: 'Candy is unhealthy.' },
+                { word: 'clever', zh: '聰明的', type: 'personality', hint: '💡 很快想到辦法', icon: '🧠', sentence: 'She is a clever girl.' },
+                { word: 'honest', zh: '誠實的', type: 'personality', hint: '🤥 皮諾丘相反詞', icon: '🤝', sentence: 'He is an honest boy.' },
+                { word: 'incorrect', zh: '不正確的', type: 'state', hint: '❌ 考卷打叉叉', icon: '❌', sentence: 'The answer is incorrect.' },
+                { word: 'dangerous', zh: '危險的', type: 'state', hint: '⚠️ 獅子靠近了！', icon: '🦁', sentence: 'Lions are dangerous.' },
+                { word: 'beautiful', zh: '美麗的', type: 'appearance', hint: '🌹 像花一樣', icon: '💃', sentence: 'The flower is beautiful.' },
+                { word: 'handsome', zh: '英俊的', type: 'appearance', hint: '🤵 穿西裝的帥哥', icon: '😎', sentence: 'He is a handsome man.' },
             ],
             2: [
-                { word: 'vacation', zh: '假期', type: 'noun', hint: '🏖️ 不用上學的日子', icon: '✈️' },
-                { word: 'machine', zh: '機器', type: 'noun', hint: '🤖 機器人也是一種...', icon: '⚙️' },
-                { word: 'engineer', zh: '工程師', type: 'job', hint: '👷 設計機器的人', icon: '💻' },
-                { word: 'businesswoman', zh: '女商人', type: 'job', hint: '💼 在公司上班的女生', icon: '👩‍💼' },
-                { word: 'surprised', zh: '驚訝的', type: 'emotion', hint: '🎁 收到意外禮物', icon: '😲' },
-                { word: 'helpful', zh: '有幫助的', type: 'personality', hint: '🤝 樂於助人', icon: '🦸' },
-                { word: 'important', zh: '重要的', type: 'state', hint: '⭐ 考試必考題', icon: '❗' },
-                { word: 'special', zh: '特別的', type: 'state', hint: '🌟 獨一無二', icon: '✨' },
-                { word: 'enough', zh: '足夠的', type: 'state', hint: '🍽️ 吃飽了，不用再多了', icon: '👌' },
-                { word: 'excellent', zh: '優秀的', type: 'state', hint: '💯 考了一百分', icon: '👍' },
+                { word: 'vacation', zh: '假期', type: 'noun', hint: '🏖️ 不用上學的日子', icon: '✈️', sentence: 'We go on vacation in summer.' },
+                { word: 'machine', zh: '機器', type: 'noun', hint: '🤖 機器人也是一種...', icon: '⚙️', sentence: 'This machine is big.' },
+                { word: 'engineer', zh: '工程師', type: 'job', hint: '👷 設計機器的人', icon: '💻', sentence: 'My dad is an engineer.' },
+                { word: 'businesswoman', zh: '女商人', type: 'job', hint: '💼 在公司上班的女生', icon: '👩‍💼', sentence: 'She is a businesswoman.' },
+                { word: 'surprised', zh: '驚訝的', type: 'emotion', hint: '🎁 收到意外禮物', icon: '😲', sentence: 'I was surprised by the party.' },
+                { word: 'helpful', zh: '有幫助的', type: 'personality', hint: '🤝 樂於助人', icon: '🦸', sentence: 'He is helpful at home.' },
+                { word: 'important', zh: '重要的', type: 'state', hint: '⭐ 考試必考題', icon: '❗', sentence: 'Water is important.' },
+                { word: 'special', zh: '特別的', type: 'state', hint: '🌟 獨一無二', icon: '✨', sentence: 'You are special to me.' },
+                { word: 'enough', zh: '足夠的', type: 'state', hint: '🍽️ 吃飽了，不用再多了', icon: '👌', sentence: 'I have enough money.' },
+                { word: 'excellent', zh: '優秀的', type: 'state', hint: '💯 考了一百分', icon: '👍', sentence: 'Your work is excellent.' },
             ],
             3: [
-                { word: 'celebrate', zh: '慶祝', type: 'verb', hint: '🎂 生日要切蛋糕', icon: '🎉' },
-                { word: 'medicine', zh: '藥', type: 'noun', hint: '💊 生病要吃...', icon: '🏥' },
-                { word: 'refrigerator', zh: '冰箱', type: 'noun', hint: '🧊 保存食物的地方', icon: '🥶' },
-                { word: 'dictionary', zh: '字典', type: 'noun', hint: '📖 查單字的書', icon: '📚' },
-                { word: 'believe', zh: '相信', type: 'verb', hint: '🙏 I believe I can fly', icon: '🤞' },
-                { word: 'address', zh: '地址', type: 'noun', hint: '🏠 你家住在哪裡？', icon: '📮' },
-                { word: 'weight', zh: '重量', type: 'measure', hint: '⚖️ 站上體重計', icon: '🐘' },
-                { word: 'height', zh: '高度', type: 'measure', hint: '📏 量身高', icon: '🦒' },
-                { word: 'centimeter', zh: '公分', type: 'unit', hint: '📏 尺上面的小格子 (cm)', icon: '🤏' },
-                { word: 'kilogram', zh: '公斤', type: 'unit', hint: '🏋️ 大象很重 (kg)', icon: '⚖️' },
+                { word: 'celebrate', zh: '慶祝', type: 'verb', hint: '🎂 生日要切蛋糕', icon: '🎉', sentence: "Let's celebrate your birthday." },
+                { word: 'medicine', zh: '藥', type: 'noun', hint: '💊 生病要吃...', icon: '🏥', sentence: 'Take this medicine.' },
+                { word: 'refrigerator', zh: '冰箱', type: 'noun', hint: '🧊 保存食物的地方', icon: '🥶', sentence: 'Put the milk in the refrigerator.' },
+                { word: 'dictionary', zh: '字典', type: 'noun', hint: '📖 查單字的書', icon: '📚', sentence: 'Use a dictionary to find words.' },
+                { word: 'believe', zh: '相信', type: 'verb', hint: '🙏 I believe I can fly', icon: '🤞', sentence: 'I believe in you.' },
+                { word: 'address', zh: '地址', type: 'noun', hint: '🏠 你家住在哪裡？', icon: '📮', sentence: 'What is your address?' },
+                { word: 'weight', zh: '重量', type: 'measure', hint: '⚖️ 站上體重計', icon: '🐘', sentence: 'What is your weight?' },
+                { word: 'height', zh: '高度', type: 'measure', hint: '📏 量身高', icon: '🦒', sentence: 'What is your height?' },
+                { word: 'centimeter', zh: '公分', type: 'unit', hint: '📏 尺上面的小格子 (cm)', icon: '🤏', sentence: 'The pencil is 10 centimeters.' },
+                { word: 'kilogram', zh: '公斤', type: 'unit', hint: '🏋️ 大象很重 (kg)', icon: '⚖️', sentence: 'The dog is 5 kilograms.' },
             ]
         };
 
         // --- Google Apps Script URL ---
-        // 更新為使用者提供的新網址
+        // 更新為使用者提供的新網址 (2025/01/31 更新)
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyABhjjT0uviY5RFvXrMZPhPVc_oJSMNKihCUJFMZzIYwzXXdI8NfwdRWM1CbOjgPME/exec";
 
         function App() {
@@ -123,6 +126,9 @@
 
             // 語音合成
             const speak = (text) => {
+                // 停止之前的發音，避免重疊
+                window.speechSynthesis.cancel();
+                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-US';
                 utterance.rate = 0.8;
@@ -171,19 +177,15 @@
                 let qList = [];
 
                 if (mode === 'quiz') {
-                    // 混合題型：
-                    // 1. reading_en: 看英選中
-                    // 2. reading_zh: 看中選英
-                    // 3. listening:  聽音選中
+                    // 混合題型
                     qList = words.map(word => {
                         const rand = Math.random();
                         let qType = 'listening';
                         
-                        if (rand > 0.66) qType = 'reading_en'; // 33% 看英文選中文
-                        else if (rand > 0.33) qType = 'reading_zh'; // 33% 看中文選英文
-                        else qType = 'listening'; // 33% 聽力
+                        if (rand > 0.66) qType = 'reading_en'; 
+                        else if (rand > 0.33) qType = 'reading_zh'; 
+                        else qType = 'listening'; 
 
-                        // 產生錯誤選項
                         const others = words.filter(w => w.word !== word.word);
                         const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
                         const options = [...distractors, word].sort(() => 0.5 - Math.random());
@@ -195,13 +197,12 @@
                         };
                     });
                 } else if (mode === 'sort') {
-                    // 配對題型 (視為看英選中)
                     qList = words.map(word => {
                         const others = words.filter(w => w.word !== word.word);
                         const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
                         const options = [...distractors, word].sort(() => 0.5 - Math.random());
                         return {
-                            type: 'matching', // treated as reading_en logic for display
+                            type: 'matching', 
                             target: word,
                             options: options
                         };
@@ -247,7 +248,6 @@
             };
 
             // --- 畫面渲染組件 ---
-            // 登入、主選單、學習模式不變，直接跳到遊戲模式渲染
 
             if (view === 'login') {
                 return (
@@ -350,24 +350,34 @@
 
                     <div className="w-full max-w-2xl grid gap-4 pb-20">
                     {words.map((item, idx) => (
-                        <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm flex items-center justify-between border-b-4 border-gray-100 hover:border-green-300 transition">
-                        <div className="flex items-center gap-4">
-                            <div className="text-4xl bg-gray-50 p-3 rounded-xl">{item.icon}</div>
-                            <div>
-                            <h3 className="text-2xl font-bold text-gray-800">{item.word}</h3>
-                            <p className="text-gray-500 font-medium">{item.zh}</p>
+                        <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between border-b-4 border-gray-100 hover:border-green-300 transition gap-4">
+                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                {/* 修改：加大 Icon 尺寸 text-4xl -> text-6xl */}
+                                <div className="text-6xl bg-gray-50 p-4 rounded-2xl">{item.icon}</div>
+                                <div>
+                                    <h3 className="text-2xl font-bold text-gray-800">{item.word}</h3>
+                                    <p className="text-gray-500 font-medium mb-1">{item.zh}</p>
+                                    
+                                    {/* 新增：例句顯示區域 */}
+                                    <div className="flex items-center gap-2 mt-2 bg-green-50 px-3 py-2 rounded-lg cursor-pointer hover:bg-green-100 transition" onClick={() => speak(item.sentence)}>
+                                        <div className="text-green-600">
+                                            <PlayCircle size={16} />
+                                        </div>
+                                        <p className="text-sm text-green-800 italic font-medium">{item.sentence}</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                            <button 
-                            onClick={() => speak(item.word)} 
-                            className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full transition"
-                            >
-                            <Volume2 size={24} />
-                            </button>
-                            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md">{item.hint}</span>
-                        </div>
-                        
+                            
+                            <div className="flex flex-row md:flex-col items-center md:items-end gap-2 w-full md:w-auto justify-end">
+                                <button 
+                                    onClick={() => speak(item.word)} 
+                                    className="bg-blue-100 hover:bg-blue-200 text-blue-600 p-3 rounded-full transition flex items-center gap-2"
+                                >
+                                    <Volume2 size={24} />
+                                    <span className="md:hidden text-sm font-bold">單字</span>
+                                </button>
+                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md">{item.hint}</span>
+                            </div>
                         </div>
                     ))}
                     </div>
@@ -375,12 +385,10 @@
                 );
             }
 
-            // 4. 遊戲/測驗模式 (重點修改區域)
             if (view === 'game') {
                 const currentQ = questions[currentQIndex];
                 const progress = ((currentQIndex) / questions.length) * 100;
                 
-                // 判斷是否為「看中文選英文」模式
                 const isReadingZh = currentQ.type === 'reading_zh';
 
                 return (
@@ -410,7 +418,6 @@
                             </div>
                         ) : (
                             <div className="py-8">
-                            {/* 如果是 reading_zh (看中文選英文)，顯示中文 target.zh；否則顯示英文 target.word */}
                             <div className="text-5xl font-black text-gray-800 mb-2">
                                 {isReadingZh ? currentQ.target.zh : currentQ.target.word}
                             </div>
@@ -436,14 +443,9 @@
                                     : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-purple-50 hover:border-purple-200'
                             }`}
                             >
-                            {/* 重點修改：只顯示單一語言 */}
-                            {/* 如果題目是看中文 (reading_zh)，選項就只顯示英文 opt.word */}
-                            {/* 其他情況 (listening, reading_en)，選項只顯示中文 opt.zh */}
                             <span className="text-xl">
                                 {isReadingZh ? opt.word : opt.zh}
                             </span>
-                            
-                            {/* 移除原本下方的第二語言提示 */}
                             </button>
                         ))}
                         </div>
