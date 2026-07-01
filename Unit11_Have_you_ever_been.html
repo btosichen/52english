@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 11 — Have you ever been…? 🌍</title>
+<style>
+/* =====================================================
+   GLOBAL RESET & BASE
+   ===================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sky:    #4FC3F7;
+  --blue:   #039BE5;
+  --green:  #66BB6A;
+  --lime:   #D4E157;
+  --yellow: #FFD54F;
+  --orange: #FFA726;
+  --pink:   #F48FB1;
+  --purple: #CE93D8;
+  --white:  #FFFFFF;
+  --light:  #F0F9FF;
+  --card:   #FFFFFF;
+  --text:   #333333;
+  --radius: 18px;
+  --shadow: 0 4px 18px rgba(0,0,0,.12);
+}
+
+body {
+  font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  background: linear-gradient(135deg, #E0F7FA 0%, #F3E5F5 50%, #FFF9C4 100%);
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* =====================================================
+   TOP HEADER
+   ===================================================== */
+#app-header {
+  background: linear-gradient(90deg, var(--blue) 0%, var(--purple) 100%);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 12px rgba(0,0,0,.2);
+}
+#app-header h1 { font-size: 1.1rem; flex: 1; }
+#back-btn {
+  background: rgba(255,255,255,.25);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+}
+#back-btn:hover { background: rgba(255,255,255,.45); }
+#back-btn.visible { display: flex; }
+
+/* =====================================================
+   SECTION MANAGEMENT — only one section visible
+   ===================================================== */
+.section { display: none; padding: 20px 16px 100px; max-width: 900px; margin: 0 auto; }
+.section.active { display: block; }
+
+/* =====================================================
+   HOME — LEARNING MAP
+   ===================================================== */
+.home-title {
+  text-align: center;
+  padding: 24px 0 16px;
+}
+.home-title h2 { font-size: 1.5rem; color: var(--blue); }
+.home-title p  { color: #555; margin-top: 4px; }
+
+.stages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.stage-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 18px;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+  border-top: 6px solid transparent;
+}
+.stage-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.15); }
+.stage-card .stage-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.stage-card h3 { font-size: 1.05rem; color: var(--text); }
+.stage-card p  { font-size: .82rem; color: #666; margin-top: 4px; }
+.stage-card .badge-dot {
+  position: absolute; top: 12px; right: 12px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #ccc; border: 2px solid #fff;
+}
+.stage-card .badge-dot.done { background: var(--green); }
+
+/* colour stripe per stage */
+.stage-card:nth-child(1) { border-color: var(--sky); }
+.stage-card:nth-child(2) { border-color: var(--green); }
+.stage-card:nth-child(3) { border-color: var(--yellow); }
+.stage-card:nth-child(4) { border-color: var(--orange); }
+.stage-card:nth-child(5) { border-color: var(--pink); }
+.stage-card:nth-child(6) { border-color: var(--purple); }
+.stage-card:nth-child(7) { border-color: var(--lime); }
+
+/* =====================================================
+   SECTION HEADINGS
+   ===================================================== */
+.sec-title {
+  font-size: 1.3rem;
+  color: var(--blue);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 40px;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 3px 8px rgba(0,0,0,.15);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,.2); }
+.btn:active { transform: scale(.96); }
+.btn-blue   { background: var(--blue);   color: #fff; }
+.btn-green  { background: var(--green);  color: #fff; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-pink   { background: var(--pink);   color: #fff; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-yellow { background: var(--yellow); color: #333; }
+.btn-sky    { background: var(--sky);    color: #fff; }
+.btn-sm     { padding: 6px 14px; font-size: .82rem; }
+.btn-full   { width: 100%; justify-content: center; margin-top: 10px; }
+
+/* =====================================================
+   FLASHCARD ZONE
+   ===================================================== */
+.card-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.card-counter { font-size: .95rem; color: #555; min-width: 60px; text-align: center; }
+
+.flip-container {
+  perspective: 900px;
+  width: 100%;
+  max-width: 440px;
+  height: 280px;
+  margin: 0 auto 20px;
+  cursor: pointer;
+}
+.flip-card {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .55s;
+}
+.flip-card.flipped { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.flip-front { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+.flip-back  { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); transform: rotateY(180deg); }
+.card-emoji { font-size: 3rem; margin-bottom: 10px; }
+.card-word  { font-size: 2rem; font-weight: 700; color: var(--blue); }
+.card-hint  { font-size: .82rem; color: #888; margin-top: 4px; }
+.card-zh    { font-size: 1.6rem; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+.card-eg    { font-size: .88rem; color: #444; font-style: italic; line-height: 1.5; }
+.card-speak { margin-top: 12px; }
+
+/* progress bar under cards */
+.card-progress-bar {
+  width: 100%; max-width: 440px; height: 8px;
+  background: #ddd; border-radius: 4px; margin: 0 auto 16px;
+  overflow: hidden;
+}
+.card-progress-fill { height: 100%; background: var(--green); transition: width .4s; }
+
+/* =====================================================
+   SENTENCE BUILDER
+   ===================================================== */
+.builder-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.builder-label { font-size: .85rem; color: #888; margin-bottom: 8px; }
+.builder-result {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--blue);
+  min-height: 34px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.word-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.chip {
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  border: 2px solid transparent;
+}
+.chip:hover { transform: scale(1.06); }
+.chip-place  { background: #E3F2FD; color: var(--blue); border-color: var(--sky); }
+.chip-place.selected { background: var(--blue); color: #fff; }
+.chip-ans    { background: #E8F5E9; color: var(--green); border-color: var(--green); }
+.chip-ans:hover { background: var(--green); color: #fff; }
+
+.subject-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.tab-btn {
+  padding: 7px 16px; border-radius: 20px;
+  border: 2px solid #ddd; background: #f5f5f5;
+  font-size: .85rem; cursor: pointer; transition: all .2s;
+}
+.tab-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+/* =====================================================
+   GRAMMAR ZONE
+   ===================================================== */
+.grammar-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.grammar-box h3 { color: var(--orange); margin-bottom: 10px; font-size: 1rem; }
+.highlight-blue   { color: var(--blue); font-weight: 700; }
+.highlight-green  { color: var(--green); font-weight: 700; }
+.highlight-orange { color: var(--orange); font-weight: 700; }
+
+table.grammar-tbl {
+  width: 100%; border-collapse: collapse; margin-top: 10px;
+  font-size: .9rem;
+}
+table.grammar-tbl th {
+  background: var(--sky); color: #fff;
+  padding: 8px 12px; text-align: left;
+}
+table.grammar-tbl td {
+  padding: 8px 12px; border-bottom: 1px solid #eee;
+}
+table.grammar-tbl tr:nth-child(even) td { background: #F0F9FF; }
+
+.pp-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #FFF9C4, #FFF59D);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+.pp-card .pp-verb { font-size: 1rem; font-weight: 700; color: var(--blue); }
+.pp-card .pp-arrow { color: #aaa; font-size: .8rem; }
+.pp-card .pp-pp    { font-size: 1rem; font-weight: 700; color: var(--green); }
+.pp-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+
+/* =====================================================
+   LISTENING ZONE
+   ===================================================== */
+.listen-item {
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.listen-text { flex: 1; font-size: .95rem; color: var(--text); }
+.listen-check {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 3px solid #ccc;
+  background: none; cursor: pointer;
+  font-size: 1rem; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.listen-check.done { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* =====================================================
+   PHONICS ZONE
+   ===================================================== */
+.phonics-target {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.phonics-word {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+.phonics-choice {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.phonics-btn {
+  padding: 14px 32px;
+  border-radius: 40px;
+  border: 3px solid transparent;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+}
+.phonics-btn.ea { background: #E3F2FD; color: var(--blue); border-color: var(--blue); }
+.phonics-btn.e  { background: #E8F5E9; color: var(--green); border-color: var(--green); }
+.phonics-btn:hover { transform: scale(1.06); }
+.phonics-feedback {
+  font-size: 1.2rem;
+  font-weight: 700;
+  min-height: 36px;
+  margin-top: 10px;
+}
+.phonics-correct { color: var(--green); }
+.phonics-wrong   { color: #E53935; }
+.phonics-score   { text-align: center; color: #555; margin-bottom: 14px; font-size: .9rem; }
+
+.phonics-ref {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.phonics-ref h3 { color: var(--orange); margin-bottom: 10px; }
+.phonics-word-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.phonics-word-tag {
+  padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: .9rem;
+}
+.tag-ea { background: #BBDEFB; color: var(--blue); }
+.tag-e  { background: #C8E6C9; color: var(--green); }
+
+/* =====================================================
+   QUIZ ZONE
+   ===================================================== */
+.quiz-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 16px;
+}
+.quiz-progress-bar {
+  flex: 1; height: 10px; background: #ddd;
+  border-radius: 5px; overflow: hidden; margin: 0 12px;
+}
+.quiz-progress-fill { height: 100%; background: var(--orange); transition: width .4s; }
+.quiz-q-num { font-size: .85rem; color: #888; white-space: nowrap; }
+.quiz-score-display { font-size: .9rem; color: var(--blue); font-weight: 600; white-space: nowrap; }
+
+.quiz-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  min-height: 200px;
+}
+.quiz-question { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 18px; line-height: 1.6; }
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-opt {
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid #ddd;
+  background: #fafafa;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: left;
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--sky); background: #E3F2FD; }
+.quiz-opt.correct { border-color: var(--green); background: #E8F5E9; color: var(--green); font-weight: 600; }
+.quiz-opt.wrong   { border-color: #E53935; background: #FFEBEE; color: #E53935; }
+.quiz-opt:disabled { cursor: not-allowed; }
+
+.quiz-feedback {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: .9rem;
+  line-height: 1.5;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok  { background: #E8F5E9; color: #2E7D32; }
+.quiz-feedback.bad { background: #FFEBEE; color: #C62828; }
+
+/* Sentence sort */
+.sort-tokens { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; min-height: 44px; }
+.sort-token {
+  padding: 8px 14px; border-radius: 20px;
+  background: #E3F2FD; color: var(--blue);
+  border: 2px solid var(--sky); cursor: pointer;
+  font-weight: 600; font-size: .9rem; transition: all .2s;
+}
+.sort-token:hover { background: var(--blue); color: #fff; }
+.sort-answer {
+  min-height: 44px;
+  border: 2px dashed #bbb;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sort-answer .sort-token { background: #FFF9C4; color: #333; border-color: var(--yellow); }
+
+/* quiz result */
+.quiz-result {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px 24px;
+  text-align: center;
+  display: none;
+}
+.quiz-result.show { display: block; }
+.result-score-big { font-size: 3.5rem; font-weight: 800; color: var(--orange); }
+.result-msg { font-size: 1.1rem; margin: 8px 0 20px; color: #555; }
+
+/* =====================================================
+   PASSPORT ZONE
+   ===================================================== */
+.passport-cover {
+  background: linear-gradient(135deg, #1565C0, #6A1B9A);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.passport-cover h2 { font-size: 1.3rem; }
+.passport-cover p  { font-size: .85rem; opacity: .85; margin-top: 4px; }
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.badge-item {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px 12px;
+  text-align: center;
+  transition: transform .2s;
+}
+.badge-item.earned { background: linear-gradient(135deg, #FFF9C4, #FFFDE7); }
+.badge-item:hover  { transform: translateY(-3px); }
+.badge-icon   { font-size: 2.6rem; display: block; margin-bottom: 8px; filter: grayscale(1); transition: filter .3s; }
+.badge-item.earned .badge-icon { filter: none; }
+.badge-name   { font-size: .85rem; font-weight: 700; color: var(--text); }
+.badge-status { font-size: .75rem; color: #aaa; margin-top: 2px; }
+.badge-item.earned .badge-status { color: var(--green); }
+
+.passport-stamps {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.passport-stamps h3 { color: var(--blue); margin-bottom: 12px; }
+.stamp-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.stamp {
+  padding: 8px 16px; border-radius: 20px;
+  border: 2px dashed var(--orange);
+  color: var(--orange); font-weight: 600; font-size: .85rem;
+}
+
+/* =====================================================
+   TOAST NOTIFICATION
+   ===================================================== */
+#toast {
+  position: fixed;
+  bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #333;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: .9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s, transform .3s;
+  z-index: 999;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* =====================================================
+   BOTTOM NAV
+   ===================================================== */
+#bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff;
+  box-shadow: 0 -3px 12px rgba(0,0,0,.12);
+  display: flex;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1; padding: 8px 4px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: .65rem; color: #aaa; cursor: pointer; transition: color .2s;
+  border: none; background: none;
+}
+.nav-item .nav-icon { font-size: 1.4rem; }
+.nav-item.active { color: var(--blue); }
+.nav-item.active .nav-icon { animation: bounce .4s; }
+@keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+
+/* =====================================================
+   MEDIA QUERIES
+   ===================================================== */
+@media (max-width: 480px) {
+  .flip-container { height: 240px; }
+  .card-word { font-size: 1.6rem; }
+  .phonics-word { font-size: 2rem; }
+  .phonics-btn { padding: 10px 22px; font-size: .95rem; }
+  .stages-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stage-card { padding: 14px; }
+  .stage-card .stage-icon { font-size: 1.8rem; }
+  .stage-card h3 { font-size: .88rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<div id="app-header">
+  <button id="back-btn" onclick="goHome()" title="回首頁">🏠</button>
+  <h1 id="header-title">🌍 Unit 11 — Have you ever been…?</h1>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div id="toast"></div>
+
+<!-- ============ SECTIONS ============ -->
+
+<!-- ① HOME -->
+<div id="sec-home" class="section active">
+  <div class="home-title">
+    <h2>🗺️ 學習地圖</h2>
+    <p>選一個關卡開始冒險吧！</p>
+  </div>
+  <div class="stages-grid" id="stages-grid">
+    <!-- generated by JS -->
+  </div>
+</div>
+
+<!-- ② VOCAB CARDS -->
+<div id="sec-vocab" class="section">
+  <div class="sec-title">🃏 第1關：單字圖卡</div>
+  <div class="card-nav">
+    <button class="btn btn-sky btn-sm" onclick="prevCard()">◀ 上一張</button>
+    <span class="card-counter" id="card-counter">1 / 13</span>
+    <button class="btn btn-sky btn-sm" onclick="nextCard()">下一張 ▶</button>
+  </div>
+  <div class="card-progress-bar">
+    <div class="card-progress-fill" id="card-prog"></div>
+  </div>
+  <div class="flip-container" onclick="flipCard()">
+    <div class="flip-card" id="flip-card">
+      <div class="flip-face flip-front" id="card-front">
+        <span class="card-emoji" id="c-emoji"></span>
+        <div class="card-word" id="c-word"></div>
+        <div class="card-hint">點一下看中文 👆</div>
+        <div class="card-speak">
+          <button class="btn btn-blue btn-sm" onclick="event.stopPropagation(); speakText(vocabData[cardIndex].en)">🔊 發音</button>
+        </div>
+      </div>
+      <div class="flip-face flip-back" id="card-back">
+        <div class="card-zh" id="c-zh"></div>
+        <div class="card-eg" id="c-eg"></div>
+        <div class="card-speak" style="margin-top:10px">
+          <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); speakText(vocabData[cardIndex].eg)">🔊 例句發音</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center;color:#888;font-size:.82rem;margin-bottom:16px">點卡片翻面 • 左右滑動換張</p>
+  <div style="display:flex;gap:10px;justify-content:center">
+    <button class="btn btn-purple" onclick="shuffleCards()">🔀 隨機排序</button>
+    <button class="btn btn-green" onclick="markVocabDone()">✅ 完成單字</button>
+  </div>
+</div>
+
+<!-- ③ SENTENCE BUILDER -->
+<div id="sec-sentence" class="section">
+  <div class="sec-title">💬 第2關：句型練習</div>
+
+  <div class="builder-box">
+    <div class="builder-label">選擇主詞</div>
+    <div class="subject-tabs" id="subj-tabs">
+      <button class="tab-btn active" data-subj="you" onclick="setSubject('you',this)">You</button>
+      <button class="tab-btn" data-subj="he" onclick="setSubject('he',this)">He</button>
+      <button class="tab-btn" data-subj="she" onclick="setSubject('she',this)">She</button>
+      <button class="tab-btn" data-subj="they" onclick="setSubject('they',this)">They</button>
+    </div>
+    <div class="builder-label">選一個地點</div>
+    <div class="word-chips" id="place-chips"><!-- generated --></div>
+    <div class="builder-label">產生問句：</div>
+    <div class="builder-result" id="build-q">（先選主詞與地點）</div>
+    <button class="btn btn-blue btn-sm" onclick="speakText(document.getElementById('build-q').textContent)">🔊 發音</button>
+  </div>
+
+  <div class="builder-box">
+    <div class="builder-label">回答：</div>
+    <div class="word-chips">
+      <div class="chip chip-ans" onclick="answerSentence('yes')">👍 Yes, I have.</div>
+      <div class="chip chip-ans" onclick="answerSentence('no')">👎 No, I haven't.</div>
+      <div class="chip chip-ans" onclick="answerSentence('yes3')">👍 Yes, he / she has.</div>
+      <div class="chip chip-ans" onclick="answerSentence('no3')">👎 No, he / she hasn't.</div>
+    </div>
+    <div class="builder-result" id="build-a"></div>
+    <button class="btn btn-green btn-sm" onclick="speakText(document.getElementById('build-a').textContent)">🔊 發音</button>
+  </div>
+
+  <button class="btn btn-orange btn-full" onclick="markSentenceDone()">✅ 完成句型練習</button>
+</div>
+
+<!-- ④ GRAMMAR -->
+<div id="sec-grammar" class="section">
+  <div class="sec-title">📚 第3關：文法小老師</div>
+
+  <div class="grammar-box">
+    <h3>🔑 什麼是現在完成式？</h3>
+    <p style="line-height:1.8;font-size:.95rem">
+      <span class="highlight-orange">Have you ever been to…?</span> 的意思是「<span class="highlight-blue">你曾經去過……嗎？</span>」<br>
+      ✦ <span class="highlight-green">ever</span> = 曾經（用在問句）<br>
+      ✦ <span class="highlight-green">never</span> = 從來沒有（用在否定）<br>
+      ✦ <span class="highlight-orange">been</span> = go 的過去分詞（past participle, pp）<br><br>
+      現在完成式表示「<b>從以前到現在的人生經驗</b>」，重點不是「什麼時候」，而是「有沒有」！
+    </p>
+  </div>
+
+  <div class="grammar-box">
+    <h3>🏗️ 句子結構</h3>
+    <table class="grammar-tbl">
+      <tr><th>主詞</th><th>助動詞</th><th>ever / never</th><th>過去分詞</th><th>地點</th></tr>
+      <tr><td>I / You / We / They</td><td class="highlight-blue">have</td><td>ever / never</td><td>been / seen…</td><td>to a desert</td></tr>
+      <tr><td>He / She / It</td><td class="highlight-orange">has</td><td>ever / never</td><td>been / seen…</td><td>to space</td></tr>
+    </table>
+    <p style="margin-top:10px;font-size:.88rem;color:#666">縮寫：I have = I've ｜ He has = He's ｜ She has = She's</p>
+  </div>
+
+  <div class="grammar-box">
+    <h3>🔄 常見過去分詞 (pp)</h3>
+    <div class="pp-grid" id="pp-grid"><!-- generated --></div>
+  </div>
+
+  <div class="grammar-box">
+    <h3>💡 冠詞提醒</h3>
+    <table class="grammar-tbl">
+      <tr><th>用法</th><th>例子</th></tr>
+      <tr><td><span class="highlight-blue">a</span> ＋子音開頭</td><td>a town / a volcano / a cave / a desert / a village / a rainforest / a capital city</td></tr>
+      <tr><td><span class="highlight-orange">an</span> ＋母音開頭</td><td>an ocean / an oasis / an island / an airport</td></tr>
+      <tr><td><span class="highlight-green">the</span> ＋唯一／特定</td><td>the ocean / the mountains</td></tr>
+      <tr><td>無冠詞</td><td>space / some mountains</td></tr>
+    </table>
+  </div>
+
+  <button class="btn btn-yellow btn-full" onclick="markGrammarDone()">✅ 文法學完了！</button>
+</div>
+
+<!-- ⑤ LISTENING -->
+<div id="sec-listen" class="section">
+  <div class="sec-title">🎧 第4關：聽力跟讀</div>
+  <p style="color:#555;margin-bottom:14px;font-size:.9rem">點🔊聽句子，跟著唸完後按✓勾選。</p>
+  <div id="listen-list"><!-- generated --></div>
+  <div style="text-align:center;margin-top:8px">
+    <span id="listen-done-count" style="color:var(--blue);font-weight:700;font-size:1rem">0 / 10 完成</span>
+  </div>
+  <button class="btn btn-orange btn-full" onclick="markListenDone()" style="margin-top:12px">✅ 完成跟讀</button>
+</div>
+
+<!-- ⑥ PHONICS -->
+<div id="sec-phonics" class="section">
+  <div class="sec-title">🔤 第5關：Phonics 拼字</div>
+
+  <div class="phonics-ref">
+    <h3>📖 ea 與 e 的字彙</h3>
+    <p style="font-size:.85rem;color:#666;margin-bottom:8px">
+      <b>ea</b> 唸 /ɛ/（短e音）：bread, head, heavy, feather<br>
+      <b>e</b>  唸 /ɛ/（短e音）：spend, tent, present, help
+    </p>
+    <div class="phonics-word-list">
+      <span class="phonics-word-tag tag-ea">bread <small>ea</small></span>
+      <span class="phonics-word-tag tag-ea">head <small>ea</small></span>
+      <span class="phonics-word-tag tag-ea">heavy <small>ea</small></span>
+      <span class="phonics-word-tag tag-ea">feather <small>ea</small></span>
+      <span class="phonics-word-tag tag-e">spend <small>e</small></span>
+      <span class="phonics-word-tag tag-e">tent <small>e</small></span>
+      <span class="phonics-word-tag tag-e">present <small>e</small></span>
+      <span class="phonics-word-tag tag-e">help <small>e</small></span>
+    </div>
+  </div>
+
+  <div class="phonics-score" id="phonics-score">分類遊戲：0 對 / 0 題</div>
+  <div class="phonics-target">
+    <div style="font-size:.85rem;color:#888;margin-bottom:6px">這個單字用哪種拼法？</div>
+    <div class="phonics-word" id="ph-word">bread</div>
+    <div style="font-size:.85rem;color:#888">點下面選擇 <b>ea</b> 還是 <b>e</b></div>
+    <div class="phonics-choice">
+      <button class="phonics-btn ea" onclick="classifyPhonics('ea')">ea</button>
+      <button class="phonics-btn e"  onclick="classifyPhonics('e')">e</button>
+    </div>
+    <div class="phonics-feedback" id="ph-feedback"></div>
+    <div style="margin-top:14px">
+      <button class="btn btn-blue btn-sm" onclick="speakText(document.getElementById('ph-word').textContent)">🔊 聽發音</button>
+    </div>
+  </div>
+
+  <button class="btn btn-pink btn-full" onclick="markPhonicsDone()">✅ 完成 Phonics</button>
+</div>
+
+<!-- ⑦ QUIZ -->
+<div id="sec-quiz" class="section">
+  <div class="sec-title">📝 第6關：小測驗</div>
+  <div class="quiz-header">
+    <div class="quiz-q-num" id="quiz-qnum">1 / 30</div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-prog"></div></div>
+    <div class="quiz-score-display">⭐ <span id="quiz-score">0</span></div>
+  </div>
+  <div id="quiz-card" class="quiz-card"><!-- generated --></div>
+  <div id="quiz-result" class="quiz-result">
+    <div style="font-size:2.5rem">🎉</div>
+    <div class="result-score-big" id="result-score"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-orange" onclick="restartQuiz()">🔄 再試一次</button>
+    <button class="btn btn-green" style="margin-left:10px" onclick="markQuizDone()">✅ 完成測驗</button>
+  </div>
+</div>
+
+<!-- ⑧ PASSPORT -->
+<div id="sec-passport" class="section">
+  <div class="passport-cover">
+    <div style="font-size:2.5rem">📖</div>
+    <h2>我的旅行護照</h2>
+    <p>My Learning Passport</p>
+    <p style="margin-top:8px;font-size:.9rem">Unit 11 — Have you ever been…?</p>
+  </div>
+
+  <div class="badges-grid" id="badges-grid"><!-- generated --></div>
+
+  <div class="passport-stamps">
+    <h3>🌍 曾經去過的地方</h3>
+    <div class="stamp-list" id="stamp-list"><!-- generated --></div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn btn-blue" onclick="resetProgress()">🗑️ 重置進度</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav id="bottom-nav">
+  <button class="nav-item active" onclick="showSection('home')">
+    <span class="nav-icon">🏠</span>首頁
+  </button>
+  <button class="nav-item" onclick="showSection('vocab')">
+    <span class="nav-icon">🃏</span>單字
+  </button>
+  <button class="nav-item" onclick="showSection('sentence')">
+    <span class="nav-icon">💬</span>句型
+  </button>
+  <button class="nav-item" onclick="showSection('grammar')">
+    <span class="nav-icon">📚</span>文法
+  </button>
+  <button class="nav-item" onclick="showSection('phonics')">
+    <span class="nav-icon">🔤</span>拼字
+  </button>
+  <button class="nav-item" onclick="showSection('quiz')">
+    <span class="nav-icon">📝</span>測驗
+  </button>
+  <button class="nav-item" onclick="showSection('passport')">
+    <span class="nav-icon">🎖️</span>護照
+  </button>
+</nav>
+
+<script>
+/* =====================================================
+   DATA — VOCABULARY
+   每個單字：en=英文, zh=中文, emoji=圖示, article=冠詞,
+             eg=例句
+   老師可在這裡修改單字與例句
+   ===================================================== */
+const vocabData = [
+  { en:'town',         zh:'城鎮',  emoji:'🏘️',  article:'a',    eg:'Have you ever been to a small town?' },
+  { en:'ocean',        zh:'海洋',  emoji:'🌊',  article:'the',  eg:'She\'s never been to the bottom of the ocean.' },
+  { en:'volcano',      zh:'火山',  emoji:'🌋',  article:'a',    eg:'Have you ever climbed a volcano?' },
+  { en:'village',      zh:'村莊',  emoji:'🛖',  article:'a',    eg:'Have you ever lived in a village?' },
+  { en:'oasis',        zh:'綠洲',  emoji:'🌴',  article:'an',   eg:'Have you ever been to an oasis?' },
+  { en:'rainforest',   zh:'雨林',  emoji:'🌿',  article:'a',    eg:'I\'ve never walked through a rainforest.' },
+  { en:'capital city', zh:'首都',  emoji:'🏛️',  article:'a',    eg:'Have you ever visited a capital city?' },
+  { en:'desert',       zh:'沙漠',  emoji:'🏜️',  article:'a',    eg:'Have you ever been to a desert?' },
+  { en:'island',       zh:'島嶼',  emoji:'🏝️',  article:'an',   eg:'Have you ever been to an island?' },
+  { en:'cave',         zh:'洞穴',  emoji:'🕳️',  article:'a',    eg:'Have you ever explored a cave?' },
+  { en:'space',        zh:'太空',  emoji:'🚀',  article:'',     eg:'Have you ever been to space?' },
+  { en:'mountains',    zh:'群山',  emoji:'⛰️',  article:'the',  eg:'We\'ve never fallen in the mountains.' },
+  { en:'airport',      zh:'機場',  emoji:'✈️',  article:'an',   eg:'Have you ever been to an airport?' },
+];
+
+/* LISTENING sentences
+   老師可新增或修改這裡的句子
+   ===================================================== */
+const listenSentences = [
+  'Have you ever been to space?',
+  'Have you ever been to a desert?',
+  'Have you ever been to an oasis?',
+  'Have you ever climbed a volcano?',
+  'I\'ve never seen a volcano.',
+  'She\'s never been to the bottom of the ocean.',
+  'We\'ve never fallen in the mountains.',
+  'Yes, I have.',
+  'No, I haven\'t.',
+  'No, he hasn\'t.',
+  'Have you ever been to an island?',
+  'They\'ve never visited a rainforest.',
+];
+
+/* PHONICS data
+   老師可在這裡新增或修改 phonics 單字
+   ===================================================== */
+const phonicsData = [
+  { word:'bread',   type:'ea' },
+  { word:'head',    type:'ea' },
+  { word:'heavy',   type:'ea' },
+  { word:'feather', type:'ea' },
+  { word:'spend',   type:'e'  },
+  { word:'tent',    type:'e'  },
+  { word:'present', type:'e'  },
+  { word:'help',    type:'e'  },
+];
+
+/* PAST PARTICIPLES
+   老師可在這裡新增或修改過去分詞
+   ===================================================== */
+const ppData = [
+  { base:'go',    pp:'been' },
+  { base:'see',   pp:'seen' },
+  { base:'fall',  pp:'fallen' },
+  { base:'climb', pp:'climbed' },
+  { base:'play',  pp:'played' },
+  { base:'visit', pp:'visited' },
+  { base:'walk',  pp:'walked' },
+  { base:'live',  pp:'lived' },
+];
+
+/* =====================================================
+   QUIZ QUESTIONS (30 題)
+   type: 'mcq' | 'sort'
+   老師可在這裡修改題庫
+   ===================================================== */
+const quizBank = [
+  /* 1-5 單字配對 */
+  { type:'mcq', q:'「沙漠」的英文是什麼？', opts:['desert','ocean','volcano','forest'], ans:0, exp:'desert = 沙漠 🏜️' },
+  { type:'mcq', q:'「火山」的英文是什麼？', opts:['island','volcano','cave','village'], ans:1, exp:'volcano = 火山 🌋' },
+  { type:'mcq', q:'"oasis" 的中文意思是？', opts:['洞穴','綠洲','雨林','城鎮'], ans:1, exp:'oasis = 綠洲 🌴' },
+  { type:'mcq', q:'"island" 的中文意思是？', opts:['島嶼','機場','太空','首都'], ans:0, exp:'island = 島嶼 🏝️' },
+  { type:'mcq', q:'"mountains" 的中文意思是？', opts:['村莊','海洋','群山','洞穴'], ans:2, exp:'mountains = 群山 ⛰️' },
+  /* 6-10 have / has */
+  { type:'mcq', q:'I _____ never been to space.', opts:['has','have','am','was'], ans:1, exp:'I 用 have：I have never been to space.' },
+  { type:'mcq', q:'She _____ ever climbed a volcano.', opts:['have','is','has','did'], ans:2, exp:'She 用 has：She has ever climbed a volcano.' },
+  { type:'mcq', q:'They _____ never visited a rainforest.', opts:['has','is','was','have'], ans:3, exp:'They 用 have。' },
+  { type:'mcq', q:'He _____ never been to an island.', opts:['have','had','has','is'], ans:2, exp:'He 用 has。' },
+  { type:'mcq', q:'We _____ never seen the ocean.', opts:['has','is','was','have'], ans:3, exp:'We 用 have。' },
+  /* 11-15 ever / never */
+  { type:'mcq', q:'Have you _____ been to a cave? (問句)', opts:['never','ever','always','just'], ans:1, exp:'問句用 ever：Have you ever been to a cave?' },
+  { type:'mcq', q:'I\'ve _____ seen a volcano. (否定)', opts:['ever','always','never','just'], ans:2, exp:'否定用 never：I\'ve never seen a volcano.' },
+  { type:'mcq', q:'She\'s _____ been to the ocean. (否定)', opts:['ever','also','never','still'], ans:2, exp:'否定句用 never。' },
+  { type:'mcq', q:'Has he _____ visited a capital city? (問句)', opts:['never','ever','always','yet'], ans:1, exp:'問句用 ever。' },
+  { type:'mcq', q:'They\'ve _____ been to an airport. (否定)', opts:['ever','never','always','just'], ans:1, exp:'否定句用 never。' },
+  /* 16-20 過去分詞 */
+  { type:'mcq', q:'"go" 的過去分詞是？', opts:['went','gone','been','going'], ans:2, exp:'go → been（用在 have been to 表示去過的地方）' },
+  { type:'mcq', q:'"see" 的過去分詞是？', opts:['saw','see','scene','seen'], ans:3, exp:'see → seen ✅' },
+  { type:'mcq', q:'"fall" 的過去分詞是？', opts:['fell','fallen','fall','falled'], ans:1, exp:'fall → fallen ✅' },
+  { type:'mcq', q:'"climb" 的過去分詞是？', opts:['climbed','clomb','climben','clumb'], ans:0, exp:'climb → climbed（規則變化）' },
+  { type:'mcq', q:'"visit" 的過去分詞是？', opts:['visited','visiting','visit','visitted'], ans:0, exp:'visit → visited（規則變化）' },
+  /* 21-24 冠詞 */
+  { type:'mcq', q:'Have you ever been to _____ oasis?', opts:['a','an','the','×'], ans:1, exp:'oasis 以母音 o 開頭，用 an。' },
+  { type:'mcq', q:'Have you ever been to _____ desert?', opts:['an','the','×','a'], ans:3, exp:'desert 以子音 d 開頭，用 a。' },
+  { type:'mcq', q:'Have you ever been to _____ space?', opts:['a','an','the','×(不需要)'], ans:3, exp:'space 不需要冠詞：Have you ever been to space?' },
+  { type:'mcq', q:'I\'ve never seen _____ volcano.', opts:['an','the','a','×'], ans:2, exp:'volcano 以子音 v 開頭，用 a。' },
+  /* 25-27 閱讀理解 */
+  { type:'mcq', q:'Tom: "Have you ever been to a rainforest?" Amy: "No, I haven\'t." 這段對話的意思是？', opts:['Amy 去過雨林','Amy 沒去過雨林','Tom 去過雨林','Tom 沒去過雨林'], ans:1, exp:'No, I haven\'t. 表示 Amy 從來沒去過雨林。' },
+  { type:'mcq', q:'"She\'s never been to the bottom of the ocean." 這句話的意思是？', opts:['她常常潛到海底','她去過海底一次','她從來沒到過海底','她很喜歡海洋'], ans:2, exp:'never = 從來沒有，她從來沒到過海底。' },
+  { type:'mcq', q:'"I\'ve never climbed a volcano." 這句話最可能的回應是？', opts:['Me neither! 我也沒有！','Really? I have!','Yes, I have.','She has, too.'], ans:0, exp:'Me neither! = 我也從來沒有！是最自然的回應。' },
+  /* 28-30 句子排序 */
+  { type:'sort', q:'排出正確句子：', tokens:['you','ever','Have','to','been','a','cave','?'], answer:'Have you ever been to a cave ?' },
+  { type:'sort', q:'排出正確句子：', tokens:['never','I\'ve','seen','a','volcano','.'], answer:'I\'ve never seen a volcano .' },
+  { type:'sort', q:'排出正確句子：', tokens:['hasn\'t','the','ocean','She','never','been','to','.'], answer:'She hasn\'t never been to the ocean .' , accept: "She has never been to the ocean ." },
+];
+
+/* =====================================================
+   STAGES META
+   ===================================================== */
+const stages = [
+  { id:'vocab',    icon:'🃏', name:'第1關 單字圖卡',    desc:'認識13個地點單字', key:'vocab' },
+  { id:'sentence', icon:'💬', name:'第2關 句型練習',    desc:'Have you ever…?', key:'sentence' },
+  { id:'grammar',  icon:'📚', name:'第3關 文法小老師',  desc:'現在完成式超清楚', key:'grammar' },
+  { id:'listen',   icon:'🎧', name:'第4關 聽力跟讀',    desc:'10句跟著唸', key:'listen' },
+  { id:'phonics',  icon:'🔤', name:'第5關 Phonics拼字', desc:'ea 還是 e？', key:'phonics' },
+  { id:'quiz',     icon:'📝', name:'第6關 小測驗',      desc:'30題大挑戰', key:'quiz' },
+  { id:'passport', icon:'🎖️', name:'第7關 旅行護照',    desc:'收集徽章！', key:'passport' },
+];
+
+const badges = [
+  { key:'vocab',    icon:'📚', name:'Vocabulary Badge', desc:'完成單字圖卡' },
+  { key:'sentence', icon:'💬', name:'Speaking Badge',   desc:'完成句型練習' },
+  { key:'grammar',  icon:'🧠', name:'Grammar Badge',    desc:'完成文法課程' },
+  { key:'listen',   icon:'🎧', name:'Listening Badge',  desc:'完成聽力跟讀' },
+  { key:'phonics',  icon:'🔤', name:'Phonics Badge',    desc:'完成拼字遊戲' },
+  { key:'quiz',     icon:'⭐', name:'Quiz Badge',       desc:'完成小測驗' },
+];
+
+/* =====================================================
+   STATE
+   ===================================================== */
+let progress = JSON.parse(localStorage.getItem('u11_progress') || '{}');
+let cardIndex = 0;
+let cardOrder = vocabData.map((_,i)=>i);
+let currentSubject = 'you';
+let currentPlace = null;
+
+let phIndex = 0;
+let phOrder = phonicsData.map((_,i)=>i);
+let phCorrect = 0;
+let phTotal   = 0;
+
+let quizIndex  = 0;
+let quizScore  = 0;
+let quizShuffled = [];
+let sortSelected = [];
+
+/* =====================================================
+   UTILS
+   ===================================================== */
+function saveProgress() {
+  localStorage.setItem('u11_progress', JSON.stringify(progress));
+}
+
+function showToast(msg, ms=2000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+function speakText(text) {
+  if (!('speechSynthesis' in window)) { showToast('此瀏覽器不支援語音'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+function shuffle(arr) {
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+/* =====================================================
+   SECTION NAVIGATION
+   ===================================================== */
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach((b,i) => {
+    const ids = ['home','vocab','sentence','grammar','phonics','quiz','passport'];
+    b.classList.toggle('active', ids[i] === id);
+  });
+  const backBtn = document.getElementById('back-btn');
+  backBtn.classList.toggle('visible', id !== 'home');
+  const titles = {
+    home:'🌍 Unit 11 — Have you ever been…?',
+    vocab:'🃏 第1關：單字圖卡', sentence:'💬 第2關：句型練習',
+    grammar:'📚 第3關：文法小老師', listen:'🎧 第4關：聽力跟讀',
+    phonics:'🔤 第5關：Phonics 拼字', quiz:'📝 第6關：小測驗',
+    passport:'🎖️ 我的旅行護照'
+  };
+  document.getElementById('header-title').textContent = titles[id] || '';
+  window.scrollTo(0,0);
+  if (id === 'passport') renderPassport();
+}
+
+function goHome() { showSection('home'); }
+
+/* =====================================================
+   HOME STAGE MAP
+   ===================================================== */
+function renderHome() {
+  const grid = document.getElementById('stages-grid');
+  grid.innerHTML = stages.map(s => `
+    <div class="stage-card" onclick="showSection('${s.id}')">
+      <div class="badge-dot ${progress[s.key] ? 'done' : ''}"></div>
+      <span class="stage-icon">${s.icon}</span>
+      <h3>${s.name}</h3>
+      <p>${s.desc}</p>
+      ${progress[s.key] ? '<p style="color:var(--green);font-size:.8rem;margin-top:6px">✅ 完成！</p>' : ''}
+    </div>
+  `).join('');
+}
+
+/* =====================================================
+   VOCAB FLASHCARDS
+   ===================================================== */
+function renderCard() {
+  const d = vocabData[cardOrder[cardIndex]];
+  document.getElementById('c-emoji').textContent = d.emoji;
+  document.getElementById('c-word').textContent  = d.en;
+  document.getElementById('c-zh').textContent    = d.zh;
+  document.getElementById('c-eg').textContent    = d.eg;
+  document.getElementById('card-counter').textContent = `${cardIndex+1} / ${vocabData.length}`;
+  const pct = ((cardIndex+1)/vocabData.length*100).toFixed(0);
+  document.getElementById('card-prog').style.width = pct+'%';
+  // reset flip
+  document.getElementById('flip-card').classList.remove('flipped');
+}
+
+function flipCard() { document.getElementById('flip-card').classList.toggle('flipped'); }
+function nextCard() { if (cardIndex < vocabData.length-1) { cardIndex++; renderCard(); } }
+function prevCard() { if (cardIndex > 0) { cardIndex--; renderCard(); } }
+function shuffleCards() { shuffle(cardOrder); cardIndex=0; renderCard(); showToast('🔀 重新隨機排列！'); }
+
+function markVocabDone() {
+  progress.vocab = true; saveProgress(); renderHome();
+  showToast('🎉 單字圖卡完成！獲得 Vocabulary Badge！');
+}
+
+// Swipe support for cards
+(function() {
+  let startX=0;
+  document.addEventListener('touchstart', e=>{ startX=e.touches[0].clientX; });
+  document.addEventListener('touchend', e=>{
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx)>50 && document.getElementById('sec-vocab').classList.contains('active')) {
+      if (dx<0) nextCard(); else prevCard();
+    }
+  });
+})();
+
+/* =====================================================
+   SENTENCE BUILDER
+   ===================================================== */
+function buildPlaceChips() {
+  const container = document.getElementById('place-chips');
+  container.innerHTML = vocabData.map((d,i) => `
+    <div class="chip chip-place" id="chip-${i}" onclick="selectPlace(${i})">${d.article ? d.article+' ' : ''}${d.en}</div>
+  `).join('');
+}
+
+function setSubject(subj, btn) {
+  currentSubject = subj;
+  document.querySelectorAll('#subj-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildQuestion();
+}
+
+function selectPlace(i) {
+  document.querySelectorAll('.chip-place').forEach(c => c.classList.remove('selected'));
+  document.getElementById('chip-'+i).classList.add('selected');
+  currentPlace = i;
+  buildQuestion();
+}
+
+function buildQuestion() {
+  if (currentPlace === null) return;
+  const d = vocabData[currentPlace];
+  const art = d.article ? d.article+' ' : '';
+  const place = art + d.en;
+  let q;
+  if (currentSubject === 'you') {
+    q = `Have you ever been to ${place}?`;
+  } else if (currentSubject === 'they') {
+    q = `Have they ever been to ${place}?`;
+  } else {
+    // he / she: use climbed vs been
+    q = `Has ${currentSubject} ever been to ${place}?`;
+  }
+  document.getElementById('build-q').textContent = q;
+  document.getElementById('build-a').textContent = '';
+}
+
+function answerSentence(type) {
+  const map = {
+    yes:  'Yes, I have.',
+    no:   "No, I haven't.",
+    yes3: 'Yes, he / she has.',
+    no3:  "No, he / she hasn't."
+  };
+  const txt = map[type];
+  document.getElementById('build-a').textContent = txt;
+  speakText(txt);
+}
+
+function markSentenceDone() {
+  progress.sentence = true; saveProgress(); renderHome();
+  showToast('🎉 句型練習完成！獲得 Speaking Badge！');
+}
+
+/* =====================================================
+   GRAMMAR
+   ===================================================== */
+function renderPPGrid() {
+  document.getElementById('pp-grid').innerHTML = ppData.map(p => `
+    <div class="pp-card">
+      <span class="pp-verb">${p.base}</span>
+      <span class="pp-arrow">→</span>
+      <span class="pp-pp">${p.pp}</span>
+    </div>
+  `).join('');
+}
+
+function markGrammarDone() {
+  progress.grammar = true; saveProgress(); renderHome();
+  showToast('🎉 文法課程完成！獲得 Grammar Badge！');
+}
+
+/* =====================================================
+   LISTENING
+   ===================================================== */
+function renderListenList() {
+  const el = document.getElementById('listen-list');
+  el.innerHTML = listenSentences.map((s,i) => `
+    <div class="listen-item">
+      <button class="btn btn-sky btn-sm" onclick="speakText('${s.replace(/'/g,"\\'")}')">🔊</button>
+      <span class="listen-text">${s}</span>
+      <button class="listen-check" id="lc-${i}" onclick="toggleListen(${i})"></button>
+    </div>
+  `).join('');
+  updateListenCount();
+}
+
+let listenDone = JSON.parse(localStorage.getItem('u11_listen') || '[]');
+
+function toggleListen(i) {
+  const btn = document.getElementById('lc-'+i);
+  if (listenDone.includes(i)) {
+    listenDone = listenDone.filter(x=>x!==i);
+    btn.classList.remove('done'); btn.textContent='';
+  } else {
+    listenDone.push(i);
+    btn.classList.add('done'); btn.textContent='✓';
+  }
+  localStorage.setItem('u11_listen', JSON.stringify(listenDone));
+  updateListenCount();
+}
+
+function updateListenCount() {
+  document.getElementById('listen-done-count').textContent =
+    `${listenDone.length} / ${listenSentences.length} 完成`;
+  // restore check marks
+  listenSentences.forEach((_,i) => {
+    const btn = document.getElementById('lc-'+i);
+    if (!btn) return;
+    if (listenDone.includes(i)) { btn.classList.add('done'); btn.textContent='✓'; }
+    else { btn.classList.remove('done'); btn.textContent=''; }
+  });
+}
+
+function markListenDone() {
+  progress.listen = true; saveProgress(); renderHome();
+  showToast('🎉 聽力跟讀完成！獲得 Listening Badge！');
+}
+
+/* =====================================================
+   PHONICS
+   ===================================================== */
+function startPhonics() {
+  shuffle(phOrder); phIndex=0; phCorrect=0; phTotal=0;
+  renderPhonicsQ();
+}
+
+function renderPhonicsQ() {
+  if (phIndex >= phOrder.length) { phIndex = 0; shuffle(phOrder); }
+  const d = phonicsData[phOrder[phIndex]];
+  document.getElementById('ph-word').textContent = d.word;
+  document.getElementById('ph-feedback').textContent = '';
+  document.getElementById('ph-feedback').className = 'phonics-feedback';
+  updatePhonicsScore();
+}
+
+function classifyPhonics(choice) {
+  const d = phonicsData[phOrder[phIndex]];
+  phTotal++;
+  const fb = document.getElementById('ph-feedback');
+  if (choice === d.type) {
+    phCorrect++;
+    fb.textContent = '✅ 答對了！' + (d.type==='ea'?'ea唸/ɛ/':'e唸/ɛ/');
+    fb.className = 'phonics-feedback phonics-correct';
+  } else {
+    fb.textContent = `❌ 答錯了！"${d.word}" 是用 ${d.type} 拼寫的喔！`;
+    fb.className = 'phonics-feedback phonics-wrong';
+  }
+  updatePhonicsScore();
+  setTimeout(() => { phIndex++; renderPhonicsQ(); }, 1600);
+}
+
+function updatePhonicsScore() {
+  document.getElementById('phonics-score').textContent =
+    `分類遊戲：${phCorrect} 對 / ${phTotal} 題`;
+}
+
+function markPhonicsDone() {
+  progress.phonics = true; saveProgress(); renderHome();
+  showToast('🎉 Phonics 完成！獲得 Phonics Badge！');
+}
+
+/* =====================================================
+   QUIZ
+   ===================================================== */
+function initQuiz() {
+  quizShuffled = shuffle([...Array(quizBank.length).keys()]);
+  quizIndex = 0; quizScore = 0;
+  document.getElementById('quiz-result').classList.remove('show');
+  document.getElementById('quiz-card').style.display = 'block';
+  renderQuizQ();
+}
+
+function renderQuizQ() {
+  if (quizIndex >= quizShuffled.length) { showQuizResult(); return; }
+  const qi = quizShuffled[quizIndex];
+  const q  = quizBank[qi];
+  const total = quizShuffled.length;
+  document.getElementById('quiz-qnum').textContent = `${quizIndex+1} / ${total}`;
+  document.getElementById('quiz-prog').style.width = ((quizIndex+1)/total*100)+'%';
+  document.getElementById('quiz-score').textContent = quizScore;
+
+  if (q.type === 'mcq') renderMCQ(q);
+  else if (q.type === 'sort') renderSort(q);
+}
+
+function renderMCQ(q) {
+  const el = document.getElementById('quiz-card');
+  const shuffledOpts = shuffle(q.opts.map((o,i)=>({o,orig:i})));
+  el.innerHTML = `
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-options">
+      ${shuffledOpts.map(({o,orig}) => `
+        <button class="quiz-opt" onclick="checkMCQ(this,${orig},${q.ans},'${escHtml(q.exp)}')">${o}</button>
+      `).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfb"></div>
+  `;
+}
+
+function escHtml(s) { return s.replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+
+function checkMCQ(btn, chosen, correct, exp) {
+  document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add('correct'); quizScore++;
+    showQFB(true, '✅ 答對了！'+exp);
+  } else {
+    btn.classList.add('wrong');
+    // highlight correct
+    document.querySelectorAll('.quiz-opt').forEach(b => {
+      const oc = parseInt(b.getAttribute('onclick').match(/,(\d+),/)[1]);
+      if (oc === correct) b.classList.add('correct');
+    });
+    showQFB(false, '❌ 答錯了。正確答案：'+exp);
+  }
+  setTimeout(() => { quizIndex++; renderQuizQ(); }, 2000);
+}
+
+function showQFB(ok, msg) {
+  const fb = document.getElementById('qfb');
+  fb.textContent = msg;
+  fb.className = 'quiz-feedback show ' + (ok ? 'ok' : 'bad');
+}
+
+/* Sort question */
+function renderSort(q) {
+  sortSelected = [];
+  const tokens = shuffle([...q.tokens]);
+  const el = document.getElementById('quiz-card');
+  el.innerHTML = `
+    <div class="quiz-question">${q.q}</div>
+    <div class="sort-answer" id="sort-ans"></div>
+    <div class="sort-tokens" id="sort-pool">
+      ${tokens.map((t,i)=>`<div class="sort-token" id="st-${i}" onclick="sortPick(${i},'${t}')">${t}</div>`).join('')}
+    </div>
+    <button class="btn btn-blue btn-sm" onclick="checkSort('${escHtml(q.answer)}','${escHtml(q.accept||q.answer)}')">✔ 確認答案</button>
+    <button class="btn btn-yellow btn-sm" onclick="resetSort()">🔄 重置</button>
+    <div class="quiz-feedback" id="qfb"></div>
+  `;
+}
+
+function sortPick(i, token) {
+  const el = document.getElementById('st-'+i);
+  if (!el || el.style.visibility==='hidden') return;
+  el.style.visibility='hidden';
+  sortSelected.push({i,token});
+  const ans = document.getElementById('sort-ans');
+  const div = document.createElement('div');
+  div.className='sort-token';
+  div.textContent=token;
+  div.onclick = () => { el.style.visibility='visible'; sortSelected=sortSelected.filter(x=>x.i!==i); div.remove(); };
+  ans.appendChild(div);
+}
+
+function resetSort() {
+  document.querySelectorAll('#sort-pool .sort-token').forEach(e=>e.style.visibility='visible');
+  document.getElementById('sort-ans').innerHTML='';
+  sortSelected=[];
+}
+
+function checkSort(answer, accept) {
+  const typed = sortSelected.map(x=>x.token).join(' ');
+  const ok = typed.toLowerCase() === answer.toLowerCase() || typed.toLowerCase() === accept.toLowerCase();
+  if (ok) { quizScore++; showQFB(true,'✅ 排對了！'+typed); }
+  else    { showQFB(false,'❌ 順序不對。正確：'+answer); }
+  setTimeout(() => { quizIndex++; renderQuizQ(); }, 2500);
+}
+
+function showQuizResult() {
+  document.getElementById('quiz-card').style.display='none';
+  const r = document.getElementById('quiz-result');
+  r.classList.add('show');
+  const total = quizShuffled.length;
+  const pct = Math.round(quizScore/total*100);
+  document.getElementById('result-score').textContent = `${quizScore} / ${total}`;
+  const msgs = [
+    [90,'🏆 超級棒！你是英文小達人！'],
+    [70,'🎉 做得很好！再複習一下就完美了！'],
+    [50,'👍 不錯！繼續加油哦！'],
+    [0, '💪 沒關係，再試一次一定會更好！'],
+  ];
+  document.getElementById('result-msg').textContent = (msgs.find(m=>pct>=m[0])||msgs[3])[1];
+  progress.quizScore = quizScore;
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-result').classList.remove('show');
+  document.getElementById('quiz-card').style.display='block';
+  initQuiz();
+}
+
+function markQuizDone() {
+  progress.quiz = true; saveProgress(); renderHome();
+  showToast('🎉 測驗完成！獲得 Quiz Badge！');
+  showSection('passport');
+}
+
+/* =====================================================
+   PASSPORT
+   ===================================================== */
+function renderPassport() {
+  // badges
+  document.getElementById('badges-grid').innerHTML = badges.map(b => `
+    <div class="badge-item ${progress[b.key] ? 'earned' : ''}">
+      <span class="badge-icon">${b.icon}</span>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-status">${progress[b.key] ? '✅ 已獲得！' : '🔒 待解鎖'}</div>
+    </div>
+  `).join('');
+
+  // stamps
+  const visitedWords = vocabData.map(d => `Have you ever been to ${d.article ? d.article+' ':'' }${d.en}?`);
+  document.getElementById('stamp-list').innerHTML = vocabData.map(d => `
+    <div class="stamp">${d.emoji} ${d.en}</div>
+  `).join('');
+
+  // mark passport done if all badges earned
+  if (badges.every(b=>progress[b.key])) {
+    progress.passport = true; saveProgress(); renderHome();
+  }
+}
+
+function resetProgress() {
+  if (!confirm('確定要重置所有學習進度嗎？')) return;
+  progress = {};
+  localStorage.removeItem('u11_progress');
+  localStorage.removeItem('u11_listen');
+  listenDone = [];
+  renderHome();
+  renderPassport();
+  showToast('進度已重置');
+}
+
+/* =====================================================
+   INIT
+   ===================================================== */
+function init() {
+  // Home
+  renderHome();
+  // Vocab
+  renderCard();
+  // Sentence builder
+  buildPlaceChips();
+  // Grammar
+  renderPPGrid();
+  // Listening
+  renderListenList();
+  // Phonics
+  startPhonics();
+  // Quiz
+  initQuiz();
+  // Passport
+  // (rendered on show)
+}
+
+init();
+</script>
+</body>
+</html>
