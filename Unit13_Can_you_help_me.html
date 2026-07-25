@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 13 — Can You Help Me? 🍓</title>
+<style>
+/* =====================================================
+   GLOBAL RESET & BASE
+   ===================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sky:    #4FC3F7;
+  --blue:   #039BE5;
+  --green:  #66BB6A;
+  --lime:   #D4E157;
+  --yellow: #FFD54F;
+  --orange: #FFA726;
+  --pink:   #F48FB1;
+  --purple: #CE93D8;
+  --red:    #EF5350;
+  --white:  #FFFFFF;
+  --light:  #F0F9FF;
+  --card:   #FFFFFF;
+  --text:   #333333;
+  --radius: 18px;
+  --shadow: 0 4px 18px rgba(0,0,0,.12);
+}
+
+body {
+  font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  background: linear-gradient(135deg, #E0F7FA 0%, #FFF9C4 50%, #FCE4EC 100%);
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* =====================================================
+   TOP HEADER
+   ===================================================== */
+#app-header {
+  background: linear-gradient(90deg, #039BE5 0%, #F48FB1 100%);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 3px 12px rgba(0,0,0,.2);
+}
+#app-header h1 { font-size: 1.05rem; flex: 1; }
+#back-btn {
+  background: rgba(255,255,255,.25);
+  border: none; color: #fff;
+  border-radius: 50%; width: 36px; height: 36px;
+  font-size: 1.2rem; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+#back-btn:hover { background: rgba(255,255,255,.45); }
+#back-btn.visible { display: flex; }
+
+/* =====================================================
+   SECTION MANAGEMENT
+   ===================================================== */
+.section { display: none; padding: 20px 16px 100px; max-width: 900px; margin: 0 auto; }
+.section.active { display: block; }
+
+/* =====================================================
+   HOME — LEARNING MAP
+   ===================================================== */
+.home-title { text-align: center; padding: 24px 0 16px; }
+.home-title h2 { font-size: 1.5rem; color: var(--blue); }
+.home-title p  { color: #555; margin-top: 4px; }
+
+.stages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px; margin-top: 16px;
+}
+.stage-card {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px 18px;
+  cursor: pointer; transition: transform .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
+  border-top: 6px solid transparent;
+}
+.stage-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.15); }
+.stage-card .stage-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.stage-card h3 { font-size: 1.05rem; color: var(--text); }
+.stage-card p  { font-size: .82rem; color: #666; margin-top: 4px; }
+.stage-card .badge-dot {
+  position: absolute; top: 12px; right: 12px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #ccc; border: 2px solid #fff;
+}
+.stage-card .badge-dot.done { background: var(--green); }
+.stage-card:nth-child(1) { border-color: var(--sky); }
+.stage-card:nth-child(2) { border-color: var(--green); }
+.stage-card:nth-child(3) { border-color: var(--yellow); }
+.stage-card:nth-child(4) { border-color: var(--orange); }
+.stage-card:nth-child(5) { border-color: var(--pink); }
+.stage-card:nth-child(6) { border-color: var(--purple); }
+.stage-card:nth-child(7) { border-color: var(--lime); }
+
+/* =====================================================
+   SECTION HEADINGS
+   ===================================================== */
+.sec-title {
+  font-size: 1.3rem; color: var(--blue);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 18px; border: none; border-radius: 40px;
+  font-size: .92rem; font-weight: 600; cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 3px 8px rgba(0,0,0,.15);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,.2); }
+.btn:active { transform: scale(.96); }
+.btn-blue   { background: var(--blue);   color: #fff; }
+.btn-green  { background: var(--green);  color: #fff; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-pink   { background: var(--pink);   color: #fff; }
+.btn-purple { background: var(--purple); color: #fff; }
+.btn-yellow { background: var(--yellow); color: #333; }
+.btn-sky    { background: var(--sky);    color: #fff; }
+.btn-red    { background: var(--red);    color: #fff; }
+.btn-sm     { padding: 6px 14px; font-size: .82rem; }
+.btn-full   { width: 100%; justify-content: center; margin-top: 10px; }
+
+/* =====================================================
+   FLASHCARD ZONE
+   ===================================================== */
+.card-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; margin-bottom: 20px;
+}
+.card-counter { font-size: .95rem; color: #555; min-width: 60px; text-align: center; }
+
+.flip-container {
+  perspective: 900px; width: 100%; max-width: 440px;
+  height: 290px; margin: 0 auto 20px; cursor: pointer;
+}
+.flip-card {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform .55s;
+}
+.flip-card.flipped { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 24px; text-align: center;
+}
+.flip-front { background: linear-gradient(135deg, #E3F2FD, #BBDEFB); }
+.flip-back  { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); transform: rotateY(180deg); }
+.card-emoji { font-size: 3rem; margin-bottom: 8px; }
+.card-word  { font-size: 2rem; font-weight: 700; color: var(--blue); }
+.card-hint  { font-size: .82rem; color: #888; margin-top: 4px; }
+.card-zh    { font-size: 1.6rem; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+.card-eg    { font-size: .88rem; color: #444; font-style: italic; line-height: 1.5; }
+.card-speak { margin-top: 12px; }
+
+.card-progress-bar {
+  width: 100%; max-width: 440px; height: 8px;
+  background: #ddd; border-radius: 4px; margin: 0 auto 16px; overflow: hidden;
+}
+.card-progress-fill { height: 100%; background: var(--green); transition: width .4s; }
+
+/* =====================================================
+   SENTENCE BUILDER
+   ===================================================== */
+.builder-box {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px; margin-bottom: 16px;
+}
+.builder-label { font-size: .85rem; color: #888; margin-bottom: 8px; }
+.builder-result {
+  font-size: 1.1rem; font-weight: 600; color: var(--blue);
+  min-height: 34px; margin-bottom: 14px; line-height: 1.6;
+}
+.word-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  padding: 8px 16px; border-radius: 30px; font-size: .88rem;
+  font-weight: 600; cursor: pointer; transition: transform .15s, box-shadow .15s;
+  border: 2px solid transparent;
+}
+.chip:hover { transform: scale(1.06); }
+.chip-subj  { background: #FFF9C4; color: #795548; border-color: var(--yellow); }
+.chip-subj.selected { background: var(--yellow); color: #333; }
+.chip-verb  { background: #E8F5E9; color: var(--green); border-color: var(--green); }
+.chip-verb.selected { background: var(--green); color: #fff; }
+.chip-obj   { background: #E3F2FD; color: var(--blue); border-color: var(--sky); }
+.chip-obj.selected  { background: var(--blue); color: #fff; }
+.chip-ans   { background: #FCE4EC; color: #C2185B; border-color: var(--pink); }
+.chip-ans:hover { background: var(--pink); color: #fff; }
+
+/* =====================================================
+   GRAMMAR ZONE
+   ===================================================== */
+.grammar-box {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px; margin-bottom: 16px;
+}
+.grammar-box h3 { color: var(--orange); margin-bottom: 10px; font-size: 1rem; }
+.highlight-blue   { color: var(--blue); font-weight: 700; }
+.highlight-green  { color: var(--green); font-weight: 700; }
+.highlight-orange { color: var(--orange); font-weight: 700; }
+.highlight-pink   { color: #C2185B; font-weight: 700; }
+
+table.grammar-tbl {
+  width: 100%; border-collapse: collapse; margin-top: 10px; font-size: .9rem;
+}
+table.grammar-tbl th {
+  background: var(--sky); color: #fff; padding: 8px 12px; text-align: left;
+}
+table.grammar-tbl td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+table.grammar-tbl tr:nth-child(even) td { background: #F0F9FF; }
+
+.pronoun-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr));
+  gap: 10px; margin-top: 12px;
+}
+.pronoun-card {
+  background: linear-gradient(135deg,#FFF9C4,#FFF59D);
+  border-radius: 12px; padding: 12px; text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+.pronoun-card .subj { font-size: 1rem; color: #888; }
+.pronoun-card .arrow { color: #bbb; font-size: .8rem; }
+.pronoun-card .obj  { font-size: 1.2rem; font-weight: 800; color: var(--blue); }
+
+.relative-box {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;
+}
+.rel-card {
+  border-radius: 14px; padding: 16px; text-align: center;
+}
+.rel-card.who  { background: #E3F2FD; }
+.rel-card.that { background: #E8F5E9; }
+.rel-card .rel-word { font-size: 1.8rem; font-weight: 800; color: var(--blue); }
+.rel-card.that .rel-word { color: var(--green); }
+.rel-card .rel-desc { font-size: .82rem; color: #555; margin-top: 4px; }
+
+.grammar-example {
+  background: #FFF8E1; border-left: 4px solid var(--yellow);
+  border-radius: 8px; padding: 10px 14px; margin-top: 8px;
+  font-size: .9rem; line-height: 1.6;
+}
+
+/* =====================================================
+   LISTENING ZONE
+   ===================================================== */
+.listen-item {
+  background: var(--card); border-radius: 14px; box-shadow: var(--shadow);
+  padding: 14px 18px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.listen-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--sky); color: #fff; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: .85rem;
+}
+.listen-text { flex: 1; font-size: .95rem; color: var(--text); line-height: 1.5; }
+.listen-check {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 3px solid #ccc; background: none; cursor: pointer;
+  font-size: 1rem; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.listen-check.done { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* =====================================================
+   PHONICS ZONE
+   ===================================================== */
+.phonics-ref {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px; margin-bottom: 16px;
+}
+.phonics-ref h3 { color: var(--orange); margin-bottom: 10px; font-size: 1rem; }
+.phonics-word-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.phonics-word-tag {
+  padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: .9rem;
+}
+.tag-el { background: #BBDEFB; color: var(--blue); }
+.tag-il { background: #C8E6C9; color: var(--green); }
+
+.phonics-target {
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 24px; text-align: center; margin-bottom: 16px;
+}
+.phonics-word { font-size: 2.8rem; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+.phonics-blank { color: var(--orange); }
+.phonics-zh    { font-size: 1rem; color: #888; margin-bottom: 16px; }
+.phonics-choice { display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+.phonics-btn {
+  padding: 12px 28px; border-radius: 40px; border: 3px solid transparent;
+  font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.phonics-btn.el { background: #E3F2FD; color: var(--blue); border-color: var(--blue); }
+.phonics-btn.il { background: #E8F5E9; color: var(--green); border-color: var(--green); }
+.phonics-btn:hover { transform: scale(1.06); }
+.phonics-feedback { font-size: 1.2rem; font-weight: 700; min-height: 36px; margin-top: 10px; }
+.phonics-correct { color: var(--green); }
+.phonics-wrong   { color: var(--red); }
+.phonics-score   { text-align: center; color: #555; margin-bottom: 14px; font-size: .9rem; }
+
+/* =====================================================
+   QUIZ ZONE
+   ===================================================== */
+.quiz-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+}
+.quiz-progress-bar {
+  flex: 1; height: 10px; background: #ddd;
+  border-radius: 5px; overflow: hidden; margin: 0 12px;
+}
+.quiz-progress-fill { height: 100%; background: var(--orange); transition: width .4s; }
+.quiz-q-num { font-size: .85rem; color: #888; white-space: nowrap; }
+.quiz-score-display { font-size: .9rem; color: var(--blue); font-weight: 600; white-space: nowrap; }
+
+.quiz-card {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 24px; min-height: 200px;
+}
+.quiz-type-label {
+  display: inline-block; background: var(--sky); color: #fff;
+  font-size: .72rem; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; margin-bottom: 10px;
+}
+.quiz-question {
+  font-size: 1.05rem; font-weight: 600; color: var(--text);
+  margin-bottom: 18px; line-height: 1.6;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 10px; }
+.quiz-opt {
+  padding: 12px 18px; border-radius: 12px; border: 2px solid #ddd;
+  background: #fafafa; font-size: .95rem; cursor: pointer;
+  transition: all .2s; text-align: left;
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--sky); background: #E3F2FD; }
+.quiz-opt.correct { border-color: var(--green); background: #E8F5E9; color: #2E7D32; font-weight: 600; }
+.quiz-opt.wrong   { border-color: var(--red);   background: #FFEBEE; color: #C62828; }
+.quiz-opt:disabled { cursor: not-allowed; }
+
+.quiz-feedback {
+  margin-top: 14px; padding: 12px 16px; border-radius: 12px;
+  font-size: .9rem; line-height: 1.5; display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok  { background: #E8F5E9; color: #2E7D32; }
+.quiz-feedback.bad { background: #FFEBEE; color: #C62828; }
+
+/* Sentence sort */
+.sort-tokens { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; min-height: 44px; }
+.sort-token {
+  padding: 8px 14px; border-radius: 20px;
+  background: #E3F2FD; color: var(--blue);
+  border: 2px solid var(--sky); cursor: pointer;
+  font-weight: 600; font-size: .9rem; transition: all .2s;
+}
+.sort-token:hover { background: var(--blue); color: #fff; }
+.sort-answer {
+  min-height: 44px; border: 2px dashed #bbb;
+  border-radius: 12px; padding: 8px;
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+}
+.sort-answer .sort-token { background: #FFF9C4; color: #333; border-color: var(--yellow); }
+
+.quiz-result {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 32px 24px;
+  text-align: center; display: none;
+}
+.quiz-result.show { display: block; }
+.result-score-big { font-size: 3.5rem; font-weight: 800; color: var(--orange); }
+.result-msg { font-size: 1.1rem; margin: 8px 0 20px; color: #555; }
+
+/* =====================================================
+   PASSPORT ZONE
+   ===================================================== */
+.passport-cover {
+  background: linear-gradient(135deg, #039BE5, #F48FB1);
+  color: #fff; border-radius: var(--radius);
+  padding: 28px; text-align: center; margin-bottom: 20px;
+}
+.passport-cover h2 { font-size: 1.3rem; }
+.passport-cover p  { font-size: .85rem; opacity: .85; margin-top: 4px; }
+
+.badges-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.badge-item {
+  background: var(--card); border-radius: 16px; box-shadow: var(--shadow);
+  padding: 20px 12px; text-align: center; transition: transform .2s;
+}
+.badge-item.earned { background: linear-gradient(135deg, #FFF9C4, #FFFDE7); }
+.badge-item:hover  { transform: translateY(-3px); }
+.badge-icon   { font-size: 2.6rem; display: block; margin-bottom: 8px; filter: grayscale(1); transition: filter .3s; }
+.badge-item.earned .badge-icon { filter: none; }
+.badge-name   { font-size: .85rem; font-weight: 700; color: var(--text); }
+.badge-status { font-size: .75rem; color: #aaa; margin-top: 2px; }
+.badge-item.earned .badge-status { color: var(--green); }
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+#toast {
+  position: fixed; bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #333; color: #fff;
+  padding: 10px 22px; border-radius: 30px;
+  font-size: .9rem; opacity: 0; pointer-events: none;
+  transition: opacity .3s, transform .3s; z-index: 999; white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* =====================================================
+   BOTTOM NAV
+   ===================================================== */
+#bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; box-shadow: 0 -3px 12px rgba(0,0,0,.12);
+  display: flex; z-index: 100;
+}
+.nav-item {
+  flex: 1; padding: 8px 4px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: .6rem; color: #aaa; cursor: pointer; transition: color .2s;
+  border: none; background: none;
+}
+.nav-item .nav-icon { font-size: 1.3rem; }
+.nav-item.active { color: var(--blue); }
+.nav-item.active .nav-icon { animation: bounce .4s; }
+@keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 480px) {
+  .flip-container { height: 250px; }
+  .card-word { font-size: 1.6rem; }
+  .phonics-word { font-size: 2rem; }
+  .stages-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stage-card { padding: 14px; }
+  .stage-card .stage-icon { font-size: 1.8rem; }
+  .stage-card h3 { font-size: .88rem; }
+  .relative-box { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<div id="app-header">
+  <button id="back-btn" onclick="goHome()" title="回首頁">🏠</button>
+  <h1 id="header-title">🍓 Unit 13 — Can You Help Me?</h1>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div id="toast"></div>
+
+<!-- ============ SECTIONS ============ -->
+
+<!-- ① HOME -->
+<div id="sec-home" class="section active">
+  <div class="home-title">
+    <h2>🗺️ 學習地圖</h2>
+    <p>選一個關卡開始冒險吧！Choose your stage! 🚀</p>
+  </div>
+  <div class="stages-grid" id="stages-grid"></div>
+</div>
+
+<!-- ② VOCAB CARDS -->
+<div id="sec-vocab" class="section">
+  <div class="sec-title">🃏 第1關：單字圖卡</div>
+  <div class="card-nav">
+    <button class="btn btn-sky btn-sm" onclick="prevCard()">◀ 上一張</button>
+    <span class="card-counter" id="card-counter">1 / 18</span>
+    <button class="btn btn-sky btn-sm" onclick="nextCard()">下一張 ▶</button>
+  </div>
+  <div class="card-progress-bar">
+    <div class="card-progress-fill" id="card-prog"></div>
+  </div>
+  <div class="flip-container" onclick="flipCard()">
+    <div class="flip-card" id="flip-card">
+      <div class="flip-face flip-front">
+        <span class="card-emoji" id="c-emoji"></span>
+        <div class="card-word" id="c-word"></div>
+        <div class="card-hint">點一下看中文 👆</div>
+        <div class="card-speak">
+          <button class="btn btn-blue btn-sm" onclick="event.stopPropagation(); speakText(vocabData[cardIndex].en)">🔊 發音</button>
+        </div>
+      </div>
+      <div class="flip-face flip-back">
+        <div class="card-zh" id="c-zh"></div>
+        <div class="card-eg" id="c-eg"></div>
+        <div class="card-speak" style="margin-top:10px">
+          <button class="btn btn-green btn-sm" onclick="event.stopPropagation(); speakText(vocabData[cardIndex].eg)">🔊 例句</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p style="text-align:center;color:#888;font-size:.82rem;margin-bottom:16px">點卡片翻面 • 左右滑動換張</p>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-purple" onclick="shuffleCards()">🔀 隨機</button>
+    <button class="btn btn-green" onclick="markDone('vocab','Vocabulary Badge')">✅ 完成單字</button>
+  </div>
+</div>
+
+<!-- ③ SENTENCE BUILDER -->
+<div id="sec-sentence" class="section">
+  <div class="sec-title">💬 第2關：句型練習</div>
+
+  <div class="builder-box">
+    <div class="builder-label">🎯 句型 1：Can you help me ___?</div>
+    <div class="builder-result" id="sent1-result">請選擇一個動作 👇</div>
+    <div class="word-chips" id="sent1-chips"></div>
+    <button class="btn btn-blue btn-sm" onclick="speakText(document.getElementById('sent1-result').innerText)">🔊 唸出來</button>
+  </div>
+
+  <div class="builder-box">
+    <div class="builder-label">🎯 句型 2：目的格代名詞 — 誰來幫忙？</div>
+    <div class="builder-result" id="sent2-result">請選主詞和受詞 👇</div>
+    <p style="font-size:.82rem;color:#888;margin-bottom:8px">① 選主詞 ② 選動作 ③ 選受詞</p>
+    <p style="font-size:.82rem;font-weight:600;color:var(--orange);margin-bottom:6px">選主詞：</p>
+    <div class="word-chips" id="sent2-subj"></div>
+    <p style="font-size:.82rem;font-weight:600;color:var(--green);margin-bottom:6px">選動作：</p>
+    <div class="word-chips" id="sent2-verb"></div>
+    <p style="font-size:.82rem;font-weight:600;color:var(--blue);margin-bottom:6px">選受詞（Object Pronoun）：</p>
+    <div class="word-chips" id="sent2-obj"></div>
+    <button class="btn btn-blue btn-sm" style="margin-top:8px" onclick="speakText(document.getElementById('sent2-result').innerText)">🔊 唸出來</button>
+  </div>
+
+  <div class="builder-box">
+    <div class="builder-label">🎯 句型 3：關係代名詞 who / that</div>
+    <div class="builder-result" id="sent3-result">點下方例句練習 👇</div>
+    <div class="word-chips" id="sent3-chips"></div>
+    <button class="btn btn-blue btn-sm" onclick="speakText(document.getElementById('sent3-result').innerText)">🔊 唸出來</button>
+  </div>
+
+  <button class="btn btn-green btn-full" onclick="markDone('sentence','Grammar Badge')">✅ 完成句型練習</button>
+</div>
+
+<!-- ④ GRAMMAR -->
+<div id="sec-grammar" class="section">
+  <div class="sec-title">📚 第3關：文法小老師</div>
+
+  <!-- Object Pronouns -->
+  <div class="grammar-box">
+    <h3>📌 Grammar 1：目的格代名詞 Object Pronouns</h3>
+    <p style="font-size:.9rem;color:#555;line-height:1.7;margin-bottom:10px">
+      動詞後面接的代名詞要用「<span class="highlight-orange">目的格</span>」，不能用主格！<br>
+      例：I'll help <span class="highlight-blue">her</span>. （不是 she）
+    </p>
+    <div class="pronoun-grid" id="pronoun-grid"></div>
+    <div class="grammar-example">
+      <b>例句練習：</b><br>
+      • Please help <span class="highlight-blue">me</span>! （幫幫我！）<br>
+      • I'll help <span class="highlight-blue">you</span>. （我來幫你。）<br>
+      • I can see <span class="highlight-blue">him</span>. （我看得到他。）<br>
+      • I'll help <span class="highlight-blue">her</span>. （我來幫她。）<br>
+      • Pour <span class="highlight-blue">it</span> in the blender. （把它倒進攪拌機。）<br>
+      • Chop <span class="highlight-blue">them</span> up, please. （請把它們切碎。）<br>
+      • They saw <span class="highlight-blue">us</span>. （他們看到我們了。）
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-blue btn-sm" onclick="speakText('Please help me. I\'ll help you. I can see him. I\'ll help her. Pour it in the blender. Chop them up please.')">🔊 聽全部</button>
+    </div>
+  </div>
+
+  <!-- Relative Pronouns -->
+  <div class="grammar-box">
+    <h3>📌 Grammar 2：關係代名詞 Relative Pronouns</h3>
+    <p style="font-size:.9rem;color:#555;line-height:1.7;margin-bottom:10px">
+      用來把兩個句子接在一起，給更多資訊！
+    </p>
+    <div class="relative-box">
+      <div class="rel-card who">
+        <div class="rel-word">who</div>
+        <div class="rel-desc">用於<b>人</b> (people)</div>
+      </div>
+      <div class="rel-card that">
+        <div class="rel-word">that</div>
+        <div class="rel-desc">用於<b>物品</b> (things)</div>
+      </div>
+    </div>
+    <div class="grammar-example" style="margin-top:12px">
+      <b>人 → who：</b><br>
+      • This is the boy <span class="highlight-blue">who</span> didn't put the lid on.<br>
+        （這就是那個沒蓋蓋子的男生。）<br>
+      • This is the boy <span class="highlight-blue">who</span> helped his friends.<br>
+        （這就是那個幫助朋友的男生。）<br><br>
+      <b>物 → that：</b><br>
+      • This is the smoothie <span class="highlight-green">that</span> was in the blender.<br>
+        （這就是那杯在攪拌機裡的果昔。）
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-blue btn-sm" onclick="speakText('This is the boy who did not put the lid on. This is the smoothie that was in the blender.')">🔊 聽例句</button>
+    </div>
+  </div>
+
+  <!-- Phonics reminder -->
+  <div class="grammar-box">
+    <h3>📌 Phonics 小提醒：el 和 il 結尾</h3>
+    <p style="font-size:.9rem;color:#555;line-height:1.7;margin-bottom:8px">
+      這些字結尾的 <span class="highlight-blue">el</span> 和 <span class="highlight-green">il</span> 讀音都像「əl」（輕輕的「歐」）
+    </p>
+    <table class="grammar-tbl">
+      <tr><th>el 結尾</th><th>il 結尾</th></tr>
+      <tr><td>tunn<span class="highlight-blue">el</span> 隧道</td><td>penc<span class="highlight-green">il</span> 鉛筆</td></tr>
+      <tr><td>cam<span class="highlight-blue">el</span> 駱駝</td><td>pup<span class="highlight-green">il</span> 學生</td></tr>
+      <tr><td>tow<span class="highlight-blue">el</span> 毛巾</td><td>April 四月</td></tr>
+      <tr><td>trav<span class="highlight-blue">el</span> 旅行</td><td>lent<span class="highlight-green">il</span>s 扁豆</td></tr>
+    </table>
+  </div>
+
+  <button class="btn btn-green btn-full" onclick="markDone('grammar','Grammar Badge')">✅ 文法學完了！</button>
+</div>
+
+<!-- ⑤ LISTENING -->
+<div id="sec-listen" class="section">
+  <div class="sec-title">🎧 第4關：聽力跟讀</div>
+  <p style="font-size:.85rem;color:#666;margin-bottom:16px">按 🔊 聽句子，聽完後按 ✔ 打勾！</p>
+  <div id="listen-list"></div>
+  <div style="text-align:center;margin-top:8px">
+    <span id="listen-count" style="font-size:.9rem;color:var(--blue);font-weight:600"></span>
+  </div>
+  <button class="btn btn-green btn-full" onclick="markDone('listen','Speaking Badge')">✅ 跟讀完成！</button>
+</div>
+
+<!-- ⑥ PHONICS -->
+<div id="sec-phonics" class="section">
+  <div class="sec-title">🔤 第5關：Phonics 拼字</div>
+
+  <div class="phonics-ref">
+    <h3>📖 el 結尾的字</h3>
+    <div class="phonics-word-list" id="phonics-el-list"></div>
+  </div>
+  <div class="phonics-ref">
+    <h3>📖 il 結尾的字</h3>
+    <div class="phonics-word-list" id="phonics-il-list"></div>
+  </div>
+
+  <div class="phonics-score" id="phonics-score"></div>
+  <div class="phonics-target">
+    <div class="phonics-word" id="ph-word"></div>
+    <div class="phonics-zh" id="ph-zh"></div>
+    <div style="font-size:.9rem;color:#888">這個字結尾是 el 還是 il？</div>
+    <div class="phonics-choice">
+      <button class="phonics-btn el" onclick="checkPhonics('el')">— el</button>
+      <button class="phonics-btn il" onclick="checkPhonics('il')">— il</button>
+    </div>
+    <div class="phonics-feedback" id="ph-feedback"></div>
+  </div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-sky" onclick="speakText(phonicsData[phIndex].word)">🔊 聽發音</button>
+    <button class="btn btn-orange" onclick="nextPhonics()">下一個 ▶</button>
+  </div>
+  <button class="btn btn-green btn-full" style="margin-top:16px" onclick="markDone('phonics','Phonics Badge')">✅ Phonics 完成！</button>
+</div>
+
+<!-- ⑦ QUIZ -->
+<div id="sec-quiz" class="section">
+  <div class="sec-title">🏆 第6關：小測驗</div>
+  <div class="quiz-header">
+    <span class="quiz-q-num" id="quiz-q-num">1 / 30</span>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-prog"></div></div>
+    <span class="quiz-score-display" id="quiz-score-disp">分數：0</span>
+  </div>
+  <div id="quiz-area">
+    <div class="quiz-card" id="quiz-card">
+      <span class="quiz-type-label" id="quiz-type-label"></span>
+      <div class="quiz-question" id="quiz-question"></div>
+      <div id="quiz-body"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+    </div>
+    <button class="btn btn-orange btn-full" id="quiz-next-btn" onclick="nextQuiz()" style="display:none">下一題 ▶</button>
+  </div>
+  <div class="quiz-result" id="quiz-result">
+    <div style="font-size:3rem;margin-bottom:8px">🎉</div>
+    <div class="result-score-big" id="result-score"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <button class="btn btn-orange" onclick="restartQuiz()">🔄 再玩一次</button>
+    <button class="btn btn-green" style="margin-top:10px" onclick="markDone('quiz','Quiz Badge'); goHome()">✅ 完成測驗</button>
+  </div>
+</div>
+
+<!-- ⑧ PASSPORT -->
+<div id="sec-passport" class="section">
+  <div class="sec-title">🛂 第7關：我的旅行護照</div>
+  <div class="passport-cover">
+    <div style="font-size:3rem">📘</div>
+    <h2>English Learning Passport</h2>
+    <p>Unit 13 — Can You Help Me? 🍓</p>
+  </div>
+  <div class="badges-grid" id="badges-grid"></div>
+  <div style="background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;text-align:center">
+    <p style="color:#888;font-size:.85rem;margin-bottom:12px">完成各關卡即可解鎖徽章！Complete each stage to unlock badges!</p>
+    <button class="btn btn-red" onclick="if(confirm('確定要重置所有進度嗎？')){resetAll();}">🔄 重置進度</button>
+  </div>
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav id="bottom-nav">
+  <button class="nav-item active" onclick="showSection('home')"><span class="nav-icon">🏠</span>首頁</button>
+  <button class="nav-item" onclick="showSection('vocab')"><span class="nav-icon">🃏</span>單字</button>
+  <button class="nav-item" onclick="showSection('sentence')"><span class="nav-icon">💬</span>句型</button>
+  <button class="nav-item" onclick="showSection('grammar')"><span class="nav-icon">📚</span>文法</button>
+  <button class="nav-item" onclick="showSection('listen')"><span class="nav-icon">🎧</span>聽讀</button>
+  <button class="nav-item" onclick="showSection('phonics')"><span class="nav-icon">🔤</span>拼字</button>
+  <button class="nav-item" onclick="showSection('quiz')"><span class="nav-icon">🏆</span>測驗</button>
+  <button class="nav-item" onclick="showSection('passport')"><span class="nav-icon">🛂</span>護照</button>
+</nav>
+
+<script>
+/* =====================================================
+   DATA — VOCABULARY
+   老師可以在這裡修改單字與例句
+   ===================================================== */
+const vocabData = [
+  // Kitchen / smoothie words
+  { en:'smoothie',   zh:'果昔',   emoji:'🥤', eg:'Can you help me make some smoothies, please?' },
+  { en:'milk',       zh:'牛奶',   emoji:'🥛', eg:'Please get some milk from the fridge.' },
+  { en:'strawberry', zh:'草莓',   emoji:'🍓', eg:'Here are some strawberries. Chop them up please.' },
+  { en:'mango',      zh:'芒果',   emoji:'🥭', eg:'Can you help me peel the mango, please?' },
+  { en:'blender',    zh:'攪拌機', emoji:'🌀', eg:'Pour the milk into the blender.' },
+  { en:'fridge',     zh:'冰箱',   emoji:'🧊', eg:'Please get some milk from the fridge.' },
+  { en:'lid',        zh:'蓋子',   emoji:'🫙', eg:'Look at the boy who forgot the lid!' },
+  { en:'chop',       zh:'切碎',   emoji:'🔪', eg:'Chop them up, please.' },
+  { en:'pour',       zh:'倒',     emoji:'💧', eg:'Pour it in the blender.' },
+  { en:'peel',       zh:'削皮',   emoji:'🍋', eg:'Can you help me peel the mango, please?' },
+  // Phonics words (el / il endings)
+  { en:'tunnel',     zh:'隧道',   emoji:'🚇', eg:'The bus goes through a long tunnel.' },
+  { en:'camel',      zh:'駱駝',   emoji:'🐪', eg:'I rode on a camel at the zoo.' },
+  { en:'towel',      zh:'毛巾',   emoji:'🏖️', eg:'Please get me a towel from the bathroom.' },
+  { en:'travel',     zh:'旅行',   emoji:'✈️', eg:'I like to travel to new places.' },
+  { en:'pencil',     zh:'鉛筆',   emoji:'✏️', eg:'I have my pencil in my bag.' },
+  { en:'pupil',      zh:'學生',   emoji:'👨‍🎓', eg:'I am a pupil at this school.' },
+  { en:'lentils',    zh:'扁豆',   emoji:'🫘', eg:'Mom made lentils for dinner.' },
+  { en:'hero',       zh:'英雄',   emoji:'🦸', eg:'Lin Hao was a hero of the earthquake.' },
+];
+
+/* =====================================================
+   DATA — LISTENING SENTENCES (至少10句)
+   ===================================================== */
+const listenData = [
+  'Can you help me make some smoothies, please?',
+  'Please get some milk from the fridge and pour it in the blender.',
+  'Here are some strawberries. Chop them up, please.',
+  "I'll help her.",
+  'Look at the boy who forgot the lid!',
+  "Sorry, Mom. I'll clean it up.",
+  'This is the boy who helped his friends.',
+  'This is the smoothie that was in the blender.',
+  "What's the matter? Tom fell down. He hurt his leg.",
+  'Where did it happen? It happened on the playground.',
+  'Take him to the school nurse, please.',
+  'I fell down in the art room yesterday.',
+  'Can you help me peel the mango, please?',
+  'Please help me! I can see him near the fridge.',
+];
+
+/* =====================================================
+   DATA — PHONICS (el and il endings)
+   ===================================================== */
+const phonicsData = [
+  { word:'tunnel',  zh:'隧道',   ending:'el' },
+  { word:'camel',   zh:'駱駝',   ending:'el' },
+  { word:'towel',   zh:'毛巾',   ending:'el' },
+  { word:'travel',  zh:'旅行',   ending:'el' },
+  { word:'pencil',  zh:'鉛筆',   ending:'il' },
+  { word:'pupil',   zh:'學生',   ending:'il' },
+  { word:'lentils', zh:'扁豆',   ending:'il' },
+  { word:'April',   zh:'四月',   ending:'il' },
+];
+
+/* =====================================================
+   DATA — QUIZ (30 題)
+   老師可以在這裡新增或修改題目
+   type: 'mc' = 選擇題, 'sort' = 排列句子
+   ===================================================== */
+const quizData = [
+  // === 單字中英配對 ===
+  { type:'mc', label:'單字配對', q:'「果昔」的英文是？', opts:['smoothie','blender','fridge','towel'], ans:0, exp:'"smoothie" 果昔，是把水果和牛奶攪在一起的飲料。' },
+  { type:'mc', label:'單字配對', q:'「攪拌機」的英文是？', opts:['lid','pour','blender','chop'], ans:2, exp:'"blender" 攪拌機，用來攪拌果昔。' },
+  { type:'mc', label:'單字配對', q:'「蓋子」的英文是？', opts:['mango','lid','milk','peel'], ans:1, exp:'"lid" 蓋子，不要忘記蓋上蓋子喔！' },
+  { type:'mc', label:'單字配對', q:'"chop" 的中文是？', opts:['倒', '削皮', '切碎', '攪拌'], ans:2, exp:'"chop" = 切碎。Chop the strawberries up, please.' },
+  { type:'mc', label:'單字配對', q:'"pour" 的中文是？', opts:['拿', '倒', '切', '洗'], ans:1, exp:'"pour" = 倒。Pour the milk into the blender.' },
+  { type:'mc', label:'單字配對', q:'"peel" 的中文是？', opts:['切碎', '清洗', '削皮', '倒進'], ans:2, exp:'"peel" = 削皮。Can you help me peel the mango?' },
+  { type:'mc', label:'單字配對', q:'「冰箱」的英文是？', opts:['blender','fridge','smoothie','lid'], ans:1, exp:'"fridge" = 冰箱。Get the milk from the fridge.' },
+  { type:'mc', label:'單字配對', q:'"tunnel" 的中文是？', opts:['駱駝', '毛巾', '隧道', '旅行'], ans:2, exp:'"tunnel" = 隧道，el 結尾，唸「əl」。' },
+  { type:'mc', label:'單字配對', q:'"camel" 的中文是？', opts:['學生', '駱駝', '扁豆', '英雄'], ans:1, exp:'"camel" = 駱駝，el 結尾。' },
+  { type:'mc', label:'單字配對', q:'"pupil" 的中文是？', opts:['鉛筆', '四月', '學生', '毛巾'], ans:2, exp:'"pupil" = 學生，il 結尾，唸「əl」。' },
+
+  // === 選擇正確 (Grammar: Object Pronouns) ===
+  { type:'mc', label:'選擇正確', q:'I\'ll help ___ . (她)', opts:['she','her','him','they'], ans:1, exp:'"She" 是主格，動詞後面要用目的格 "her"。' },
+  { type:'mc', label:'選擇正確', q:'Please help ___ ! (我)', opts:['I','my','me','mine'], ans:2, exp:'動詞後面用目的格，"I" → "me"。' },
+  { type:'mc', label:'選擇正確', q:'I can see ___ . (他)', opts:['he','his','him','they'], ans:2, exp:'"He" → 目的格 "him"。' },
+  { type:'mc', label:'選擇正確', q:'Pour ___ in the blender. (它)', opts:['its','it','they','them'], ans:1, exp:'"It" 的目的格還是 "it"。' },
+  { type:'mc', label:'選擇正確', q:'Chop ___ up please. (它們)', opts:['they','their','them','those'], ans:2, exp:'"They" → 目的格 "them"。' },
+  { type:'mc', label:'選擇正確', q:'They saw ___ . (我們)', opts:['we','our','ours','us'], ans:3, exp:'"We" → 目的格 "us"。' },
+  { type:'mc', label:'選擇正確', q:'I\'ll help ___ . (你)', opts:['your','you','yours','I'], ans:1, exp:'"You" 的主格和目的格一樣，都是 "you"。' },
+
+  // === 選擇正確 (Grammar: Relative Pronouns) ===
+  { type:'mc', label:'選擇正確', q:'This is the boy ___ didn\'t put the lid on.', opts:['that','which','who','what'], ans:2, exp:'"who" 用於人。"that" 用於物品。The boy is a person, so use "who".' },
+  { type:'mc', label:'選擇正確', q:'This is the smoothie ___ was in the blender.', opts:['who','whom','what','that'], ans:3, exp:'"that" 用於物品。Smoothie is a thing, so use "that".' },
+  { type:'mc', label:'選擇正確', q:'She is the girl ___ helped her brother.', opts:['which','that','who','what'], ans:2, exp:'"who" 用於人（girl）。' },
+
+  // === Phonics el / il ===
+  { type:'mc', label:'Phonics 拼字', q:'"tunn_l" — 這個字結尾是 el 還是 il？（隧道）', opts:['el','il'], ans:0, exp:'tunnel = tunn + el，el 結尾，唸「əl」。' },
+  { type:'mc', label:'Phonics 拼字', q:'"penc_l" — 這個字結尾是 el 還是 il？（鉛筆）', opts:['el','il'], ans:1, exp:'pencil = penc + il，il 結尾，唸「əl」。' },
+  { type:'mc', label:'Phonics 拼字', q:'"cam_l" — 這個字結尾是 el 還是 il？（駱駝）', opts:['el','il'], ans:0, exp:'camel = cam + el。' },
+  { type:'mc', label:'Phonics 拼字', q:'"pup_l" — 這個字結尾是 el 還是 il？（學生）', opts:['el','il'], ans:1, exp:'pupil = pup + il。' },
+
+  // === 句子排序 ===
+  { type:'sort', label:'句子排序', q:'排出正確句子：(請幫我做果昔)', words:['Can','you','help','me','make','some','smoothies','please'], ans:'Can you help me make some smoothies please', exp:'Can you help me make some smoothies, please?' },
+  { type:'sort', label:'句子排序', q:'排出正確句子：(把它倒進攪拌機)', words:['Pour','it','in','the','blender'], ans:'Pour it in the blender', exp:'Pour it in the blender.' },
+  { type:'sort', label:'句子排序', q:'排出正確句子：(這是忘了蓋蓋子的男生)', words:['This','is','the','boy','who','forgot','the','lid'], ans:'This is the boy who forgot the lid', exp:'This is the boy who forgot the lid!' },
+
+  // === 閱讀理解 ===
+  { type:'mc', label:'閱讀理解', q:'Aunt說：「Can you help me make some smoothies, please?」\n她要Leo做什麼？', opts:['清洗碗盤', '幫忙做果昔', '去買草莓', '蓋蓋子'], ans:1, exp:'Aunt 請 Leo 幫忙做果昔（fruit smoothies）。' },
+  { type:'mc', label:'閱讀理解', q:'「Sorry, Mom. I\'ll clean it up.」\n說這句話的原因是什麼？', opts:['他打破了杯子', '他忘了蓋蓋子，果昔溢出來了', '他沒有幫媽媽', '他把草莓切錯了'], ans:1, exp:'Leo 沒蓋蓋子，果昔溢出來了，所以他道歉並說要清理。' },
+  { type:'mc', label:'閱讀理解', q:'Lin Hao was a hero. What did he do?\nLin Hao 是英雄，因為他做了什麼？', opts:['他發明了果昔', '地震後他幫助了兩位朋友', '他跑得非常快', '他救了一隻駱駝'], ans:1, exp:'2008年地震後，Lin Hao 雖然手受傷，仍勇敢地幫助了兩位朋友。' },
+];
+
+/* =====================================================
+   STATE
+   ===================================================== */
+let cardIndex = 0;
+let cardOrder = vocabData.map((_,i)=>i);
+let phIndex = 0;
+let phScore = 0; let phTotal = 0;
+let quizIndex = 0; let quizScore = 0; let quizOrder = [];
+let progress = JSON.parse(localStorage.getItem('u13progress')||'{}');
+// progress keys: vocab, sentence, grammar, listen, phonics, quiz + badge flags
+
+/* =====================================================
+   NAVIGATION
+   ===================================================== */
+const sectionIds = ['home','vocab','sentence','grammar','listen','phonics','quiz','passport'];
+
+function showSection(id) {
+  sectionIds.forEach(s => {
+    document.getElementById('sec-'+s).classList.toggle('active', s===id);
+  });
+  document.querySelectorAll('.nav-item').forEach((el,i) => {
+    el.classList.toggle('active', sectionIds[i]===id);
+  });
+  const backBtn = document.getElementById('back-btn');
+  backBtn.classList.toggle('visible', id!=='home');
+  document.getElementById('header-title').textContent =
+    id==='home'     ? '🍓 Unit 13 — Can You Help Me?'  :
+    id==='vocab'    ? '🃏 第1關：單字圖卡'              :
+    id==='sentence' ? '💬 第2關：句型練習'              :
+    id==='grammar'  ? '📚 第3關：文法小老師'            :
+    id==='listen'   ? '🎧 第4關：聽力跟讀'              :
+    id==='phonics'  ? '🔤 第5關：Phonics 拼字'         :
+    id==='quiz'     ? '🏆 第6關：小測驗'               :
+                      '🛂 第7關：我的旅行護照';
+  if (id==='passport') renderPassport();
+}
+
+function goHome() { showSection('home'); }
+
+/* =====================================================
+   HOME STAGE CARDS
+   ===================================================== */
+const stages = [
+  { id:'vocab',    icon:'🃏', title:'第1關 單字圖卡',    desc:'Learn 18 vocabulary words', key:'vocab' },
+  { id:'sentence', icon:'💬', title:'第2關 句型練習',    desc:'Build sentences with patterns', key:'sentence' },
+  { id:'grammar',  icon:'📚', title:'第3關 文法小老師',  desc:'Object & Relative Pronouns', key:'grammar' },
+  { id:'listen',   icon:'🎧', title:'第4關 聽力跟讀',    desc:'Listen & repeat 14 sentences', key:'listen' },
+  { id:'phonics',  icon:'🔤', title:'第5關 Phonics 拼字', desc:'el and il endings', key:'phonics' },
+  { id:'quiz',     icon:'🏆', title:'第6關 小測驗',      desc:'30 questions challenge!', key:'quiz' },
+  { id:'passport', icon:'🛂', title:'第7關 我的護照',    desc:'Collect your badges!', key:'passport' },
+];
+
+function renderHome() {
+  const grid = document.getElementById('stages-grid');
+  grid.innerHTML = stages.map(s => `
+    <div class="stage-card" onclick="showSection('${s.id}')">
+      <div class="badge-dot ${progress[s.key]?'done':''}"></div>
+      <span class="stage-icon">${s.icon}</span>
+      <h3>${s.title}</h3>
+      <p>${s.desc}</p>
+    </div>`).join('');
+}
+
+/* =====================================================
+   VOCAB CARDS
+   ===================================================== */
+function renderCard() {
+  const d = vocabData[cardOrder[cardIndex]];
+  document.getElementById('c-emoji').textContent = d.emoji;
+  document.getElementById('c-word').textContent  = d.en;
+  document.getElementById('c-zh').textContent   = d.zh;
+  document.getElementById('c-eg').textContent   = d.eg;
+  document.getElementById('card-counter').textContent = `${cardIndex+1} / ${vocabData.length}`;
+  document.getElementById('card-prog').style.width = ((cardIndex+1)/vocabData.length*100)+'%';
+  document.getElementById('flip-card').classList.remove('flipped');
+}
+function flipCard()  { document.getElementById('flip-card').classList.toggle('flipped'); }
+function nextCard()  { cardIndex=(cardIndex+1)%vocabData.length; renderCard(); }
+function prevCard()  { cardIndex=(cardIndex-1+vocabData.length)%vocabData.length; renderCard(); }
+function shuffleCards() {
+  cardOrder.sort(()=>Math.random()-.5);
+  cardIndex=0; renderCard(); showToast('🔀 已隨機排序！');
+}
+
+// Touch swipe support
+let touchStartX=0;
+document.querySelector('.flip-container')?.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+document.querySelector('.flip-container')?.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>40){ dx<0?nextCard():prevCard(); }
+},{passive:true});
+
+/* =====================================================
+   SENTENCE BUILDER
+   ===================================================== */
+// Sentence 1: Can you help me ___?
+const sent1Actions = [
+  {label:'make smoothies 🥤', val:'make some smoothies'},
+  {label:'chop strawberries 🍓', val:'chop the strawberries'},
+  {label:'peel the mango 🥭', val:'peel the mango'},
+  {label:'pour the milk 🥛', val:'pour the milk'},
+  {label:'get the fridge 🧊', val:'get the milk from the fridge'},
+];
+
+function buildSent1Chips() {
+  document.getElementById('sent1-chips').innerHTML = sent1Actions.map((a,i)=>
+    `<span class="chip chip-ans" onclick="selectSent1(${i})">${a.label}</span>`
+  ).join('');
+}
+function selectSent1(i) {
+  document.getElementById('sent1-result').textContent = `Can you help me ${sent1Actions[i].val}, please?`;
+  speakText(document.getElementById('sent1-result').textContent);
+}
+
+// Sentence 2: Subject + verb + object pronoun
+const s2Subjs = ['I','You','He','She','We','They'];
+const s2Verbs = ["'ll help","can see","'ll clean","can hear"];
+const s2Objs  = [
+  {label:'me（我）',val:'me'},{label:'you（你）',val:'you'},
+  {label:'him（他）',val:'him'},{label:'her（她）',val:'her'},
+  {label:'it（它）',val:'it'},{label:'them（它們）',val:'them'},
+  {label:'us（我們）',val:'us'},
+];
+let s2selSubj='', s2selVerb='', s2selObj='';
+
+function buildSent2() {
+  document.getElementById('sent2-subj').innerHTML = s2Subjs.map((s,i)=>
+    `<span class="chip chip-subj" onclick="pickS2('subj',${i},'${s}')">${s}</span>`).join('');
+  document.getElementById('sent2-verb').innerHTML = s2Verbs.map((v,i)=>
+    `<span class="chip chip-verb" onclick="pickS2('verb',${i},'${v}')">${v}</span>`).join('');
+  document.getElementById('sent2-obj').innerHTML = s2Objs.map((o,i)=>
+    `<span class="chip chip-obj" onclick="pickS2('obj',${i},'${o.val}')">${o.label}</span>`).join('');
+}
+function pickS2(type,i,val) {
+  if(type==='subj'){s2selSubj=val; document.querySelectorAll('#sent2-subj .chip').forEach((c,j)=>c.classList.toggle('selected',j===i));}
+  if(type==='verb'){s2selVerb=val; document.querySelectorAll('#sent2-verb .chip').forEach((c,j)=>c.classList.toggle('selected',j===i));}
+  if(type==='obj') {s2selObj=val;  document.querySelectorAll('#sent2-obj .chip').forEach((c,j)=>c.classList.toggle('selected',j===i));}
+  if(s2selSubj&&s2selVerb&&s2selObj){
+    const sent=`${s2selSubj}${s2selVerb} ${s2selObj}.`;
+    document.getElementById('sent2-result').textContent=sent;
+    speakText(sent);
+  }
+}
+
+// Sentence 3: Relative pronoun examples
+const sent3Examples = [
+  'This is the boy who forgot the lid.',
+  'This is the boy who helped his friends.',
+  'This is the smoothie that was in the blender.',
+  'She is the girl who helped her brother.',
+  'I rode on the camel that was at the zoo.',
+];
+function buildSent3() {
+  document.getElementById('sent3-chips').innerHTML = sent3Examples.map((s,i)=>
+    `<span class="chip chip-ans" onclick="selectSent3(${i})">${s.length>30?s.substring(0,30)+'…':s}</span>`
+  ).join('');
+}
+function selectSent3(i) {
+  document.getElementById('sent3-result').textContent = sent3Examples[i];
+  speakText(sent3Examples[i]);
+}
+
+/* =====================================================
+   OBJECT PRONOUN TABLE
+   ===================================================== */
+const pronouns = [
+  {subj:'I',   obj:'me'},   {subj:'You', obj:'you'},
+  {subj:'He',  obj:'him'},  {subj:'She', obj:'her'},
+  {subj:'It',  obj:'it'},   {subj:'They',obj:'them'},
+  {subj:'We',  obj:'us'},
+];
+function buildPronounGrid() {
+  document.getElementById('pronoun-grid').innerHTML = pronouns.map(p=>`
+    <div class="pronoun-card" onclick="speakText('${p.subj} becomes ${p.obj}')">
+      <div class="subj">${p.subj}</div>
+      <div class="arrow">↓</div>
+      <div class="obj">${p.obj}</div>
+    </div>`).join('');
+}
+
+/* =====================================================
+   LISTENING
+   ===================================================== */
+let listenChecked = new Set();
+function buildListenList() {
+  document.getElementById('listen-list').innerHTML = listenData.map((s,i)=>`
+    <div class="listen-item">
+      <div class="listen-num">${i+1}</div>
+      <div class="listen-text">${s}</div>
+      <button class="btn btn-sky btn-sm" onclick="speakText('${s.replace(/'/g,"\\'")}')">🔊</button>
+      <button class="listen-check ${listenChecked.has(i)?'done':''}" id="lc-${i}" onclick="toggleListen(${i})">${listenChecked.has(i)?'✓':''}</button>
+    </div>`).join('');
+  updateListenCount();
+}
+function toggleListen(i) {
+  if(listenChecked.has(i)) listenChecked.delete(i); else listenChecked.add(i);
+  const btn = document.getElementById('lc-'+i);
+  btn.classList.toggle('done', listenChecked.has(i));
+  btn.textContent = listenChecked.has(i)?'✓':'';
+  updateListenCount();
+}
+function updateListenCount() {
+  document.getElementById('listen-count').textContent = `已完成 ${listenChecked.size} / ${listenData.length} 句`;
+}
+
+/* =====================================================
+   PHONICS
+   ===================================================== */
+function buildPhonicsLists() {
+  document.getElementById('phonics-el-list').innerHTML =
+    phonicsData.filter(p=>p.ending==='el').map(p=>
+      `<span class="phonics-word-tag tag-el" onclick="speakText('${p.word}')">${p.word}</span>`).join('');
+  document.getElementById('phonics-il-list').innerHTML =
+    phonicsData.filter(p=>p.ending==='il').map(p=>
+      `<span class="phonics-word-tag tag-il" onclick="speakText('${p.word}')">${p.word}</span>`).join('');
+}
+let phonicsOrder = phonicsData.map((_,i)=>i).sort(()=>Math.random()-.5);
+
+function renderPhonics() {
+  const d = phonicsData[phonicsOrder[phIndex % phonicsOrder.length]];
+  const stem = d.word.slice(0, -2);
+  const end  = d.word.slice(-2);
+  document.getElementById('ph-word').innerHTML = `${stem}<span class="phonics-blank">___</span>`;
+  document.getElementById('ph-zh').textContent  = d.zh;
+  document.getElementById('ph-feedback').textContent = '';
+  document.getElementById('ph-feedback').className  = 'phonics-feedback';
+  document.getElementById('phonics-score').textContent = `答對 ${phScore} / 嘗試 ${phTotal}`;
+}
+function checkPhonics(chosen) {
+  const d = phonicsData[phonicsOrder[phIndex % phonicsOrder.length]];
+  phTotal++;
+  const fb = document.getElementById('ph-feedback');
+  if(chosen===d.ending) {
+    phScore++;
+    fb.textContent = `🎉 答對了！${d.word}（${d.zh}）= ${d.word.slice(0,-2)} + ${d.ending}`;
+    fb.className   = 'phonics-feedback phonics-correct';
+    speakText('Correct! '+d.word);
+  } else {
+    fb.textContent = `💡 提示：${d.word} 的結尾是 "${d.ending}"，不是 "${chosen}"喔！`;
+    fb.className   = 'phonics-feedback phonics-wrong';
+    speakText(d.word);
+  }
+  document.getElementById('phonics-score').textContent = `答對 ${phScore} / 嘗試 ${phTotal}`;
+}
+function nextPhonics() {
+  phIndex++;
+  if(phIndex >= phonicsOrder.length) {
+    phonicsOrder.sort(()=>Math.random()-.5);
+    phIndex=0;
+  }
+  renderPhonics();
+}
+
+/* =====================================================
+   QUIZ
+   ===================================================== */
+function initQuiz() {
+  quizOrder = quizData.map((_,i)=>i);
+  // Optional: shuffle
+  // quizOrder.sort(()=>Math.random()-.5);
+  quizIndex=0; quizScore=0;
+  document.getElementById('quiz-result').classList.remove('show');
+  document.getElementById('quiz-area').style.display='block';
+  renderQuiz();
+}
+
+function renderQuiz() {
+  if(quizIndex>=quizData.length){ showQuizResult(); return; }
+  const q = quizData[quizOrder[quizIndex]];
+  document.getElementById('quiz-q-num').textContent = `${quizIndex+1} / ${quizData.length}`;
+  document.getElementById('quiz-prog').style.width = (quizIndex/quizData.length*100)+'%';
+  document.getElementById('quiz-score-disp').textContent = `分數：${quizScore}`;
+  document.getElementById('quiz-type-label').textContent = q.label;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-feedback').className = 'quiz-feedback';
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-next-btn').style.display='none';
+
+  const body = document.getElementById('quiz-body');
+  if(q.type==='mc') {
+    body.innerHTML = `<div class="quiz-options">${q.opts.map((o,i)=>
+      `<button class="quiz-opt" onclick="answerMC(${i})">${String.fromCharCode(65+i)}. ${o}</button>`
+    ).join('')}</div>`;
+  } else if(q.type==='sort') {
+    // Sentence sort
+    let shuffled = [...q.words].sort(()=>Math.random()-.5);
+    let selected = [];
+    body.innerHTML = `
+      <div class="sort-answer" id="sort-ans"></div>
+      <div class="sort-tokens" id="sort-pool">${shuffled.map((w,i)=>
+        `<span class="sort-token" onclick="pickSortToken(this,'${w}')">${w}</span>`
+      ).join('')}</div>
+      <button class="btn btn-blue btn-sm" onclick="checkSort('${q.ans}')">✅ 確認答案</button>
+      <button class="btn btn-sky btn-sm" onclick="resetSort()">🔄 重置</button>`;
+  }
+}
+
+function answerMC(i) {
+  const q = quizData[quizOrder[quizIndex]];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.disabled=true);
+  const correct = i===q.ans;
+  opts[i].classList.add(correct?'correct':'wrong');
+  if(!correct) opts[q.ans].classList.add('correct');
+  if(correct) quizScore++;
+  const fb = document.getElementById('quiz-feedback');
+  fb.textContent = (correct?'🎉 答對了！':'❌ 再想想～') + ' ' + q.exp;
+  fb.className = 'quiz-feedback show '+(correct?'ok':'bad');
+  document.getElementById('quiz-next-btn').style.display='flex';
+}
+
+function pickSortToken(el, word) {
+  if(el.parentId==='sort-ans') return; // already placed
+  const pool = document.getElementById('sort-pool');
+  const ans  = document.getElementById('sort-ans');
+  if(el.parentElement.id==='sort-pool') {
+    el.parentElement.removeChild(el);
+    el.onclick = ()=>returnSortToken(el,word);
+    ans.appendChild(el);
+  }
+}
+function returnSortToken(el, word) {
+  const pool = document.getElementById('sort-pool');
+  el.parentElement.removeChild(el);
+  el.onclick = ()=>pickSortToken(el,word);
+  pool.appendChild(el);
+}
+function checkSort(correctAns) {
+  const ansTokens = [...document.getElementById('sort-ans').children];
+  const userAns = ansTokens.map(t=>t.textContent).join(' ');
+  const correct = userAns.trim()===correctAns.trim();
+  if(correct) quizScore++;
+  const fb = document.getElementById('quiz-feedback');
+  const q  = quizData[quizOrder[quizIndex]];
+  fb.textContent = (correct?'🎉 正確！':'❌ 正確答案是：'+q.exp) + ' ' + q.exp;
+  fb.className = 'quiz-feedback show '+(correct?'ok':'bad');
+  document.getElementById('quiz-next-btn').style.display='flex';
+}
+function resetSort() {
+  renderQuiz();
+}
+function nextQuiz() { quizIndex++; renderQuiz(); }
+
+function showQuizResult() {
+  document.getElementById('quiz-area').style.display='none';
+  const result = document.getElementById('quiz-result');
+  result.classList.add('show');
+  const pct = Math.round(quizScore/quizData.length*100);
+  document.getElementById('result-score').textContent = `${quizScore} / ${quizData.length}`;
+  document.getElementById('result-msg').textContent =
+    pct>=90 ? '🌟 超棒！你是英語小達人！'  :
+    pct>=70 ? '👍 做得很好！繼續加油！'     :
+    pct>=50 ? '💪 不錯喔！再複習一下吧！'  :
+              '📖 再多練習幾次，你一定可以！';
+  progress.quiz = true;
+  progress.quizScore = quizScore;
+  saveProgress();
+}
+function restartQuiz() { initQuiz(); }
+
+/* =====================================================
+   PASSPORT / BADGES
+   ===================================================== */
+const badges = [
+  { key:'vocab',    icon:'📚', name:'Vocabulary Badge', desc:'完成單字圖卡' },
+  { key:'sentence', icon:'💬', name:'Grammar Badge',    desc:'完成句型練習' },
+  { key:'listen',   icon:'🎧', name:'Speaking Badge',   desc:'完成聽力跟讀' },
+  { key:'phonics',  icon:'🔤', name:'Phonics Badge',    desc:'完成拼字練習' },
+  { key:'quiz',     icon:'🏆', name:'Quiz Badge',       desc:'完成小測驗' },
+];
+function renderPassport() {
+  document.getElementById('badges-grid').innerHTML = badges.map(b=>`
+    <div class="badge-item ${progress[b.key]?'earned':''}">
+      <span class="badge-icon">${b.icon}</span>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-status">${progress[b.key]?'✅ 已獲得！':'🔒 未解鎖'}</div>
+    </div>`).join('');
+}
+
+function markDone(key, badgeName) {
+  progress[key]=true;
+  saveProgress();
+  renderHome();
+  showToast(`🏅 恭喜解鎖 ${badgeName}！`);
+}
+function saveProgress() { localStorage.setItem('u13progress', JSON.stringify(progress)); }
+function resetAll() {
+  progress={};
+  localStorage.removeItem('u13progress');
+  listenChecked=new Set();
+  phScore=0; phTotal=0;
+  renderHome(); renderPassport();
+  showToast('🔄 進度已重置');
+}
+
+/* =====================================================
+   WEB SPEECH API
+   ===================================================== */
+function speakText(text) {
+  if(!window.speechSynthesis) { showToast('此瀏覽器不支援語音'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang='en-US'; u.rate=0.88; u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* =====================================================
+   INIT
+   ===================================================== */
+function init() {
+  renderHome();
+  renderCard();
+  buildSent1Chips();
+  buildSent2();
+  buildSent3();
+  buildPronounGrid();
+  buildListenList();
+  buildPhonicsLists();
+  renderPhonics();
+  initQuiz();
+  renderPassport();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
