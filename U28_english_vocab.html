@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💰 全民英檢初級 Unit 28 單字樂園</title>
+<style>
+  :root {
+    --sky: #4FC3F7;
+    --sun: #FFD54F;
+    --grass: #81C784;
+    --coral: #FF8A65;
+    --purple: #CE93D8;
+    --pink: #F48FB1;
+    --mint: #80CBC4;
+    --peach: #FFCC80;
+    --bg: #FFF9F0;
+    --card-bg: #FFFFFF;
+    --text: #333;
+    --shadow: 0 4px 15px rgba(0,0,0,0.1);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Microsoft JhengHei', Arial, sans-serif;
+    background: linear-gradient(135deg, #FFF9F0 0%, #E3F2FD 50%, #FFF3E0 100%);
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: linear-gradient(135deg, #42A5F5, #26C6DA, #66BB6A);
+    color: white;
+    text-align: center;
+    padding: 20px 15px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(66,165,245,0.4);
+  }
+  header h1 { font-size: clamp(1.2rem, 4vw, 1.8rem); font-weight: 900; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+  header p { font-size: 0.85rem; opacity: 0.95; margin-top: 4px; }
+  .header-stats {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px;
+  }
+  .stat-badge {
+    background: rgba(255,255,255,0.3); backdrop-filter: blur(10px);
+    border-radius: 20px; padding: 4px 14px; font-size: 0.8rem; font-weight: 700;
+  }
+
+  /* ===== NAV TABS ===== */
+  .nav-tabs {
+    display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    padding: 14px 10px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  .tab-btn {
+    border: none; cursor: pointer; border-radius: 25px;
+    padding: 8px 18px; font-size: 0.85rem; font-weight: 700;
+    transition: all 0.25s; color: #666; background: #f0f0f0;
+  }
+  .tab-btn.active { color: white; transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  .tab-btn:nth-child(1).active { background: linear-gradient(135deg,#42A5F5,#26C6DA); }
+  .tab-btn:nth-child(2).active { background: linear-gradient(135deg,#FF6B9D,#FF8E53); }
+  .tab-btn:nth-child(3).active { background: linear-gradient(135deg,#81C784,#26A69A); }
+  .tab-btn:nth-child(4).active { background: linear-gradient(135deg,#FFD54F,#FF8F00); }
+
+  /* ===== SEARCH BAR ===== */
+  .search-wrap {
+    padding: 12px 15px 0;
+    max-width: 500px; margin: 0 auto;
+  }
+  .search-bar {
+    width: 100%; padding: 10px 18px;
+    border: 2.5px solid #4FC3F7; border-radius: 25px;
+    font-size: 1rem; outline: none;
+    background: white; transition: border-color 0.3s;
+  }
+  .search-bar:focus { border-color: #42A5F5; }
+
+  /* ===== SECTIONS ===== */
+  .section { display: none; padding: 15px; max-width: 1100px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* ===== CATEGORY FILTER ===== */
+  .cat-filter {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;
+  }
+  .cat-btn {
+    border: none; cursor: pointer; border-radius: 20px;
+    padding: 5px 14px; font-size: 0.78rem; font-weight: 700;
+    background: #e8e8e8; color: #555; transition: all 0.2s;
+  }
+  .cat-btn.active { background: linear-gradient(135deg,#42A5F5,#26C6DA); color: white; }
+
+  /* ===== VOCAB GRID ===== */
+  .vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+  }
+
+  /* ===== VOCAB CARD ===== */
+  .vocab-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px 18px 48px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+    border-left: 6px solid;
+  }
+  .vocab-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+  .vocab-card:nth-child(6n+1) { border-color: #42A5F5; }
+  .vocab-card:nth-child(6n+2) { border-color: #FF6B9D; }
+  .vocab-card:nth-child(6n+3) { border-color: #81C784; }
+  .vocab-card:nth-child(6n+4) { border-color: #FFD54F; }
+  .vocab-card:nth-child(6n+5) { border-color: #CE93D8; }
+  .vocab-card:nth-child(6n+6) { border-color: #FF8A65; }
+
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .word-num { font-size: 0.75rem; color: #bbb; font-weight: 600; }
+  .card-main { flex: 1; }
+  .word-en {
+    font-size: 1.5rem; font-weight: 900; color: #42A5F5;
+    letter-spacing: 0.5px; line-height: 1.2;
+  }
+  .word-phonetic { font-size: 0.82rem; color: #888; margin: 2px 0; }
+  .word-pos-zh {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
+  }
+  .pos-tag {
+    font-size: 0.72rem; font-weight: 700; padding: 2px 8px;
+    border-radius: 10px; background: #E3F2FD; color: #1565C0;
+    border: 1.5px solid #90CAF9;
+  }
+  .word-zh { font-size: 0.95rem; color: #555; font-weight: 600; margin-top: 2px; }
+
+  .speak-btn {
+    background: linear-gradient(135deg, #42A5F5, #26C6DA);
+    border: none; cursor: pointer; border-radius: 50%;
+    width: 40px; height: 40px; color: white; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(66,165,245,0.4);
+  }
+  .speak-btn:hover { transform: scale(1.15); }
+  .speak-btn.speaking { animation: pulse 0.6s infinite alternate; background: linear-gradient(135deg,#FF6B9D,#FF8E53); }
+  @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+
+  /* Spelling tip */
+  .spell-tip {
+    margin-top: 8px; padding: 6px 10px;
+    background: linear-gradient(135deg, #FFF9C4, #FFECB3);
+    border-radius: 10px; font-size: 0.8rem; color: #795548;
+    display: flex; gap: 5px; align-items: flex-start;
+  }
+  .spell-emoji { flex-shrink: 0; }
+
+  /* Memory trick */
+  .memory-trick {
+    margin-top: 8px; padding: 8px 10px;
+    background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+    border-radius: 10px; font-size: 0.8rem; color: #2E7D32;
+    border-left: 3px solid #81C784;
+  }
+  .memory-trick strong { color: #1B5E20; }
+
+  /* Examples */
+  .examples { margin-top: 10px; }
+  .example-item {
+    margin-top: 6px; padding: 8px 10px;
+    background: #F8F9FA; border-radius: 10px;
+    border-left: 3px solid #42A5F5; font-size: 0.82rem;
+  }
+  .example-en { color: #1565C0; font-weight: 600; line-height: 1.5; }
+  .example-zh { color: #888; margin-top: 2px; font-size: 0.78rem; }
+
+  /* Conjugation */
+  .conjugation {
+    margin-top: 8px; padding: 6px 10px;
+    background: linear-gradient(135deg, #F3E5F5, #EDE7F6);
+    border-radius: 10px; font-size: 0.78rem; color: #6A1B9A;
+  }
+
+  /* Expand button */
+  .expand-btn {
+    background: none; border: 1.5px solid #ddd; border-radius: 15px;
+    padding: 4px 12px; font-size: 0.75rem; color: #888; cursor: pointer;
+    margin-top: 8px; transition: all 0.2s; width: 100%;
+  }
+  .expand-btn:hover { border-color: #42A5F5; color: #42A5F5; }
+
+  .card-details { margin-top: 8px; }
+  .hidden { display: none; }
+
+  /* Learnt badge — placed at BOTTOM right, far from speak-btn (top right) */
+  .learnt-btn {
+    position: absolute; bottom: 12px; right: 12px;
+    background: none; border: 2px dashed #ccc; border-radius: 20px;
+    padding: 4px 10px; cursor: pointer; font-size: 0.78rem; font-weight: 700;
+    display: flex; align-items: center; gap: 4px; color: #aaa;
+    transition: all 0.3s;
+  }
+  .learnt-btn.learnt { border-color: #81C784; background: #E8F5E9; color: #2E7D32; }
+  .learnt-btn:hover { transform: scale(1.05); border-color: #81C784; color: #2E7D32; }
+
+  /* ===== FLASHCARD SECTION ===== */
+  .flashcard-wrap { max-width: 500px; margin: 0 auto; }
+  .fc-progress-bar { background: #eee; border-radius: 20px; height: 10px; margin-bottom: 20px; overflow: hidden; }
+  .fc-progress-fill { background: linear-gradient(90deg,#42A5F5,#26C6DA); height: 100%; border-radius: 20px; transition: width 0.4s; }
+  .fc-counter { text-align: center; font-size: 0.9rem; color: #888; margin-bottom: 16px; }
+
+  .flashcard-scene {
+    perspective: 1000px; width: 100%;
+    aspect-ratio: 1.5; cursor: pointer; margin-bottom: 20px;
+  }
+  .flashcard-inner {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d; transition: transform 0.5s;
+  }
+  .flashcard-inner.flipped { transform: rotateY(180deg); }
+  .fc-front, .fc-back {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; border-radius: var(--radius);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 24px; box-shadow: var(--shadow);
+  }
+  .fc-front {
+    background: linear-gradient(135deg, #42A5F5, #26C6DA);
+    color: white;
+  }
+  .fc-front .fc-word { font-size: clamp(1.8rem, 8vw, 2.8rem); font-weight: 900; }
+  .fc-front .fc-phonetic { font-size: 1rem; opacity: 0.9; margin-top: 8px; }
+  .fc-front .fc-hint { font-size: 0.85rem; opacity: 0.8; margin-top: 16px; }
+  .fc-back {
+    background: linear-gradient(135deg, #E3F2FD, #E8EAF6);
+    transform: rotateY(180deg);
+  }
+  .fc-back .fc-zh { font-size: 1.6rem; font-weight: 900; color: #1565C0; }
+  .fc-back .fc-pos { font-size: 0.9rem; color: #5C6BC0; margin-top: 6px; }
+  .fc-back .fc-ex { font-size: 0.82rem; color: #555; margin-top: 12px; text-align: center; line-height: 1.6; }
+
+  .fc-controls { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .fc-btn {
+    border: none; cursor: pointer; border-radius: 25px;
+    padding: 12px 24px; font-size: 0.9rem; font-weight: 700;
+    transition: all 0.2s; color: white;
+  }
+  .fc-btn.prev { background: linear-gradient(135deg,#90A4AE,#78909C); }
+  .fc-btn.speak { background: linear-gradient(135deg,#42A5F5,#26C6DA); }
+  .fc-btn.next { background: linear-gradient(135deg,#81C784,#26A69A); }
+  .fc-btn.shuffle { background: linear-gradient(135deg,#CE93D8,#AB47BC); }
+  .fc-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+  /* ===== QUIZ SECTION ===== */
+  .quiz-wrap { max-width: 620px; margin: 0 auto; }
+  .quiz-score-bar {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .score-chip {
+    padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;
+  }
+  .score-chip.correct { background: #E8F5E9; color: #2E7D32; }
+  .score-chip.wrong { background: #FFEBEE; color: #C62828; }
+  .score-chip.total { background: #E3F2FD; color: #1565C0; }
+
+  .quiz-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px;
+  }
+  .quiz-q-num { font-size: 0.8rem; color: #bbb; margin-bottom: 8px; }
+  .quiz-type-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 0.75rem; font-weight: 700; margin-bottom: 12px;
+  }
+  .quiz-question { font-size: 1.15rem; font-weight: 700; color: #333; margin-bottom: 16px; line-height: 1.6; }
+  .quiz-sentence { font-style: italic; color: #555; font-size: 0.95rem; }
+  .quiz-options { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+  .quiz-opt {
+    border: 2.5px solid #e0e0e0; border-radius: 12px;
+    padding: 12px 16px; cursor: pointer; font-size: 0.9rem;
+    background: white; text-align: left; transition: all 0.2s;
+    font-weight: 600; color: #444;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: #42A5F5; background: #E3F2FD; }
+  .quiz-opt.correct-ans { border-color: #81C784; background: #E8F5E9; color: #2E7D32; }
+  .quiz-opt.wrong-ans { border-color: #EF9A9A; background: #FFEBEE; color: #C62828; }
+  .quiz-opt:disabled { cursor: default; }
+
+  .fill-input {
+    width: 100%; padding: 12px 16px; border: 2.5px solid #e0e0e0; border-radius: 12px;
+    font-size: 1rem; font-weight: 600; outline: none; transition: border-color 0.3s;
+  }
+  .fill-input:focus { border-color: #42A5F5; }
+  .fill-input.correct-ans { border-color: #81C784; background: #E8F5E9; color: #2E7D32; }
+  .fill-input.wrong-ans { border-color: #EF9A9A; background: #FFEBEE; color: #C62828; }
+
+  .quiz-feedback {
+    margin-top: 14px; padding: 12px 16px; border-radius: 12px;
+    font-size: 0.88rem; line-height: 1.6; display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: #E8F5E9; color: #2E7D32; }
+  .quiz-feedback.wrong-fb { background: #FFEBEE; color: #C62828; }
+
+  .quiz-next-btn {
+    margin-top: 14px; width: 100%; padding: 12px;
+    background: linear-gradient(135deg,#42A5F5,#26C6DA);
+    border: none; border-radius: 12px; color: white;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; display: none;
+  }
+  .quiz-next-btn.show { display: block; }
+  .quiz-next-btn:hover { opacity: 0.9; transform: scale(1.02); }
+
+  .quiz-result {
+    text-align: center; padding: 30px;
+    background: white; border-radius: var(--radius); box-shadow: var(--shadow);
+    display: none;
+  }
+  .quiz-result.show { display: block; }
+  .result-emoji { font-size: 4rem; }
+  .result-score { font-size: 2.5rem; font-weight: 900; margin: 10px 0; }
+  .result-score.great { color: #42A5F5; }
+  .result-score.good { color: #FF8E53; }
+  .result-score.ok { color: #81C784; }
+  .result-msg { font-size: 1.1rem; color: #666; margin-bottom: 20px; }
+  .restart-btn {
+    background: linear-gradient(135deg,#81C784,#26A69A);
+    border: none; border-radius: 25px; padding: 14px 30px;
+    color: white; font-size: 1rem; font-weight: 700; cursor: pointer;
+  }
+
+  /* ===== PROGRESS SECTION ===== */
+  .progress-wrap { max-width: 700px; margin: 0 auto; }
+  .progress-overview {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .overview-card {
+    background: white; border-radius: var(--radius); padding: 18px;
+    text-align: center; box-shadow: var(--shadow);
+  }
+  .overview-num { font-size: 2.2rem; font-weight: 900; }
+  .overview-num.pink { color: #42A5F5; }
+  .overview-num.green { color: #81C784; }
+  .overview-num.blue { color: #26C6DA; }
+  .overview-label { font-size: 0.82rem; color: #888; margin-top: 4px; }
+
+  .review-list { display: grid; gap: 10px; }
+  .review-item {
+    background: white; border-radius: 12px; padding: 14px 18px;
+    display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .ri-word { font-size: 1.1rem; font-weight: 800; color: #42A5F5; flex: 1; }
+  .ri-zh { font-size: 0.85rem; color: #888; }
+  .ri-status { font-size: 1.3rem; }
+  .clear-btn {
+    background: linear-gradient(135deg,#FF8A65,#FF5722);
+    border: none; border-radius: 25px; padding: 10px 22px;
+    color: white; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    margin-bottom: 16px;
+  }
+
+  /* ===== STARS ANIMATION ===== */
+  @keyframes starPop { 0%{transform:scale(0) rotate(-20deg);opacity:0} 60%{transform:scale(1.3) rotate(10deg);opacity:1} 100%{transform:scale(1);opacity:1} }
+  .star-pop { animation: starPop 0.4s ease-out; }
+
+  /* ===== CATEGORY LABEL ===== */
+  .section-title {
+    font-size: 1.3rem; font-weight: 900; color: #42A5F5;
+    margin-bottom: 12px; padding-left: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cat-group-title {
+    grid-column: 1/-1; font-size: 1rem; font-weight: 800;
+    color: white; padding: 8px 16px; border-radius: 12px;
+    background: linear-gradient(135deg,#42A5F5,#26C6DA);
+    margin-top: 8px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 520px) {
+    .vocab-grid { grid-template-columns: 1fr; }
+    .quiz-options { grid-template-columns: 1fr; }
+    .fc-controls { gap: 8px; }
+    .fc-btn { padding: 10px 16px; font-size: 0.82rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>💰 全民英檢初級 Unit 28 單字樂園</h1>
+  <p>金錢・事件・法律・生活 45 個單字 ✦ 邊玩邊學超有趣！</p>
+  <div class="header-stats">
+    <span class="stat-badge">📚 45 個單字</span>
+    <span class="stat-badge" id="learntCount">⭐ 已學 0 個</span>
+    <span class="stat-badge" id="quizHighScore">🏆 最高分 --</span>
+  </div>
+</header>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('browse')">📖 單字瀏覽</button>
+  <button class="tab-btn" onclick="switchTab('flashcard')">🃏 單字卡</button>
+  <button class="tab-btn" onclick="switchTab('quiz')">🎯 測驗</button>
+  <button class="tab-btn" onclick="switchTab('progress')">📊 學習紀錄</button>
+</div>
+
+<!-- ===== BROWSE ===== -->
+<div id="section-browse" class="section active">
+  <div class="search-wrap">
+    <input type="text" class="search-bar" id="searchBar" placeholder="🔍 搜尋單字..." oninput="filterCards()">
+  </div>
+  <div style="padding:12px 15px 0; max-width:1100px; margin:0 auto;">
+    <div class="cat-filter" id="catFilter">
+      <button class="cat-btn active" onclick="filterCat('all',this)">全部 45</button>
+      <button class="cat-btn" onclick="filterCat('金錢',this)">💰 金錢消費</button>
+      <button class="cat-btn" onclick="filterCat('動作',this)">🎯 動作事件</button>
+      <button class="cat-btn" onclick="filterCat('法律',this)">⚖️ 法律犯罪</button>
+      <button class="cat-btn" onclick="filterCat('生活',this)">🌟 生活情境</button>
+    </div>
+  </div>
+  <div class="section" style="display:block; padding-top:10px;">
+    <div class="vocab-grid" id="vocabGrid"></div>
+    <p id="noResult" style="text-align:center;color:#bbb;padding:40px;display:none;">找不到符合的單字 😅</p>
+  </div>
+</div>
+
+<!-- ===== FLASHCARD ===== -->
+<div id="section-flashcard" class="section">
+  <div class="flashcard-wrap">
+    <p style="text-align:center;color:#888;margin-bottom:12px;font-size:0.88rem;">💡 點擊卡片翻轉，查看中文意思和例句！</p>
+    <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgress" style="width:0%"></div></div>
+    <div class="fc-counter" id="fcCounter">第 1 / 45 張</div>
+
+    <div class="flashcard-scene" onclick="flipCard()">
+      <div class="flashcard-inner" id="flashcardInner">
+        <div class="fc-front">
+          <div class="fc-word" id="fcWord">bill</div>
+          <div class="fc-phonetic" id="fcPhonetic">[bɪl]</div>
+          <div class="fc-hint">👆 點擊看中文</div>
+        </div>
+        <div class="fc-back">
+          <div class="fc-zh" id="fcZh">帳單</div>
+          <div class="fc-pos" id="fcPos">名詞</div>
+          <div class="fc-ex" id="fcEx"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fc-controls">
+      <button class="fc-btn prev" onclick="fcNav(-1)">⬅ 上一張</button>
+      <button class="fc-btn speak" onclick="speakWord(fcVocab[fcIndex].en)">🔊 發音</button>
+      <button class="fc-btn next" onclick="fcNav(1)">下一張 ➡</button>
+    </div>
+    <div style="text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="fc-btn shuffle" onclick="shuffleFC()">🔀 隨機排列</button>
+      <button class="fc-btn" style="background:linear-gradient(135deg,#FF8A65,#FF5722);" onclick="fcFilter('all')">📋 全部單字</button>
+      <button class="fc-btn" style="background:linear-gradient(135deg,#81C784,#26A69A);" onclick="fcFilter('unlearnt')">🌟 未學會的</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="section-quiz" class="section">
+  <div class="quiz-wrap">
+    <div class="quiz-score-bar">
+      <span class="score-chip correct">✅ 答對：<span id="qCorrect">0</span></span>
+      <span class="score-chip wrong">❌ 答錯：<span id="qWrong">0</span></span>
+      <span class="score-chip total">📋 共 <span id="qTotal">10</span> 題</span>
+    </div>
+    <div id="quizCard" class="quiz-card">
+      <div class="quiz-q-num" id="qNum">第 1 題</div>
+      <div class="quiz-type-badge" id="qTypeBadge" style="background:#BBE0FB;color:#1565C0;">英翻中</div>
+      <div class="quiz-question" id="qQuestion"></div>
+      <div class="quiz-options" id="qOptions"></div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+      <button class="quiz-next-btn" id="qNextBtn" onclick="nextQuestion()">下一題 ➡</button>
+    </div>
+    <div class="quiz-result" id="quizResult">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <button class="restart-btn" onclick="startQuiz()">🔄 再玩一次！</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROGRESS ===== -->
+<div id="section-progress" class="section">
+  <div class="progress-wrap">
+    <div class="progress-overview">
+      <div class="overview-card">
+        <div class="overview-num pink" id="ovTotal">45</div>
+        <div class="overview-label">📚 總單字數</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-num green" id="ovLearnt">0</div>
+        <div class="overview-label">⭐ 已學會</div>
+      </div>
+      <div class="overview-card">
+        <div class="overview-num blue" id="ovLeft">45</div>
+        <div class="overview-label">📖 待複習</div>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:#888;margin-bottom:12px;">點擊單字卡上的 ⭐ 按鈕，標記已學會的單字</p>
+    <button class="clear-btn" onclick="clearLearnt()">🗑️ 清除所有學習紀錄</button>
+    <div class="review-list" id="reviewList"></div>
+  </div>
+</div>
+
+<script>
+const vocab = [
+  // 💰 金錢消費
+  {no:1,en:"bill",phonetic:"[bɪl]",pos:"名",zh:"帳單；鈔票",cat:"金錢",
+   spell:"b + ill",
+   memory:"<b>BILL</b> = 帳單！想像你的好朋友叫 Bill，每次聚餐都讓你付帳單 Bill！💸",
+   examples:[
+     {en:"The bill for dinner came to fifty dollars.",zh:"晚餐帳單共計五十元。"},
+     {en:"Can I pay the bill with a credit card?",zh:"我可以用信用卡付帳嗎？"}
+   ]},
+  {no:2,en:"ticket",phonetic:"[ˋtɪkɪt]",pos:"名",zh:"票；罰單",cat:"金錢",
+   spell:"tick + et",
+   memory:"<b>TICKET</b> = tick（打勾）+ et！打勾確認就拿到 ticket（票）！罰單也要打勾簽名 🎫",
+   examples:[
+     {en:"I bought two tickets to the concert.",zh:"我買了兩張演唱會的票。"},
+     {en:"He got a parking ticket for parking in the wrong place.",zh:"他因為停錯地方而收到了一張罰單。"}
+   ]},
+  {no:3,en:"cash",phonetic:"[kæʃ]",pos:"名",zh:"現金",cat:"金錢",
+   spell:"c + ash",
+   memory:"<b>CASH</b> = C + ASH！Cash 就是現金！想像鈔票燃燒後變成 ASH（灰燼）= 花光光！💰🔥",
+   examples:[
+     {en:"Do you have any cash on you?",zh:"你身上有現金嗎？"},
+     {en:"I prefer to pay in cash.",zh:"我比較喜歡用現金支付。"}
+   ]},
+  {no:4,en:"cent",phonetic:"[sɛnt]",pos:"名",zh:"分（一百分等於一元）",cat:"金錢",
+   spell:"c + ent",
+   memory:"<b>CENT</b> 聽起來像「仙」！台幣一角也叫一仙！100 cents = 1 dollar！記住 cent = 百分之一 💵",
+   examples:[
+     {en:"This candy costs fifty cents.",zh:"這顆糖果要五十分。"},
+     {en:"I don't have a cent in my pocket.",zh:"我口袋裡連一分錢都沒有。"}
+   ]},
+  {no:5,en:"coin",phonetic:"[kɔɪn]",pos:"名",zh:"硬幣",cat:"金錢",
+   spell:"c + oin",
+   memory:"<b>COIN</b> = 硬幣！想像投 COIN 進遊戲機，哦伊！OIN 的聲音就像硬幣投進去的聲音 🪙",
+   examples:[
+     {en:"I found a coin on the street.",zh:"我在街上找到一枚硬幣。"},
+     {en:"She saved all her coins in a piggy bank.",zh:"她把所有硬幣存在撲滿裡。"}
+   ]},
+  {no:6,en:"dollar",phonetic:"[ˋdɑlər]",pos:"名",zh:"元（美金等貨幣單位）",cat:"金錢",
+   spell:"doll + ar",
+   memory:"<b>DOLLAR</b> = DOLL + AR！布娃娃（DOLL）要 AR（啊！）這麼貴！要好多 dollars！🪆💰",
+   examples:[
+     {en:"This shirt costs twenty dollars.",zh:"這件衣服要二十元。"},
+     {en:"The exchange rate is thirty NT dollars to one US dollar.",zh:"匯率是三十元新台幣換一美金。"}
+   ]},
+  {no:7,en:"money",phonetic:"[ˋmʌnɪ]",pos:"名",zh:"金錢",cat:"金錢",
+   spell:"mon + ey",
+   memory:"<b>MONEY</b> = MON + EY！MON（星期一）上班賺錢最辛苦！有 MONEY 才有 HONEY（蜂蜜）！🍯💰",
+   examples:[
+     {en:"Money can't buy happiness.",zh:"金錢買不到快樂。"},
+     {en:"She saved her money to buy a new bicycle.",zh:"她存錢要買新的腳踏車。"}
+   ]},
+  {no:8,en:"price",phonetic:"[praɪs]",pos:"名",zh:"價格；標價",cat:"金錢",
+   spell:"pr + ice",
+   memory:"<b>PRICE</b> = PR + ICE！像一塊珍貴的冰（ICE）= 有價格的東西！普萊斯！💎❄️",
+   examples:[
+     {en:"What is the price of this watch?",zh:"這手錶多少錢？"},
+     {en:"The prices at this restaurant are too high.",zh:"這家餐廳的價格太貴了。"}
+   ]},
+  {no:9,en:"cheap",phonetic:"[tʃip]",pos:"形",zh:"便宜的",cat:"金錢",
+   spell:"ch + eap",
+   memory:"<b>CHEAP</b> = CH + EAP！EAP 聽起來像「一A一P」很便宜！cheap 反義是 expensive 昂貴！🏷️",
+   examples:[
+     {en:"This restaurant is cheap and delicious.",zh:"這家餐廳便宜又好吃。"},
+     {en:"I found a cheap flight to Japan.",zh:"我找到了一張便宜的機票去日本。"}
+   ]},
+  {no:10,en:"expensive",phonetic:"[ɪkˋspɛnsɪv]",pos:"形",zh:"昂貴的",cat:"金錢",
+   spell:"ex + pen + sive",
+   memory:"<b>EXPENSIVE</b> = EX + PEN + SIVE！光是一支 PEN（筆）就要花大錢 EX 出去！超貴！✒️💸",
+   examples:[
+     {en:"This dress is too expensive for me.",zh:"這件洋裝對我來說太貴了。"},
+     {en:"Living in the city is very expensive.",zh:"住在城市裡費用非常高。"}
+   ]},
+  {no:11,en:"change",phonetic:"[tʃendʒ]",pos:"動/名",zh:"改變；零錢",cat:"金錢",
+   spell:"ch + ange",
+   memory:"<b>CHANGE</b> = CH + ANGE！付錢後找回的「零錢」也叫 change！改變（change）就像找零錢一樣！🔄💰",
+   conjugation:"change → changed → changed → changing",
+   examples:[
+     {en:"Keep the change!",zh:"不用找零了！"},
+     {en:"Please change your wet clothes.",zh:"請換掉你濕掉的衣服。"}
+   ]},
+  {no:12,en:"charge",phonetic:"[tʃɑrdʒ]",pos:"動/名",zh:"索取費用；充電",cat:"金錢",
+   spell:"ch + arge",
+   memory:"<b>CHARGE</b> = CH + ARGE！手機需要充電（charge）！服務需要收費（charge）！兩個都叫 charge！🔌💲",
+   conjugation:"charge → charged → charged → charging",
+   examples:[
+     {en:"The hotel charges fifty dollars a night.",zh:"這間旅館一晚收費五十元。"},
+     {en:"I need to charge my phone.",zh:"我需要幫手機充電。"}
+   ]},
+  {no:13,en:"cost",phonetic:"[kɔst]",pos:"動/名",zh:"花費；成本",cat:"金錢",
+   spell:"c + ost",
+   memory:"<b>COST</b> = C + OST！COST 聽起來像「扣死特」= 扣掉錢就是花費！cost 不變形，過去式也是 cost！💰",
+   conjugation:"cost → cost → cost → costing",
+   examples:[
+     {en:"How much does it cost?",zh:"這要多少錢？"},
+     {en:"The new car cost him all his savings.",zh:"這輛新車花光了他所有的積蓄。"}
+   ]},
+  {no:14,en:"pay",phonetic:"[pe]",pos:"動/名",zh:"付錢；薪水",cat:"金錢",
+   spell:"p + ay",
+   memory:"<b>PAY</b> = P + AY！P 像一個人的頭，AY 嘆氣聲，付錢的時候都會嘆氣「哎～要付錢了」💳",
+   conjugation:"pay → paid → paid → paying",
+   examples:[
+     {en:"I will pay for dinner tonight.",zh:"今晚晚餐由我請客。"},
+     {en:"Her pay is not very high.",zh:"她的薪水不是很高。"}
+   ]},
+  {no:15,en:"spend",phonetic:"[spɛnd]",pos:"動",zh:"花費（錢或時間）",cat:"金錢",
+   spell:"sp + end",
+   memory:"<b>SPEND</b> = SP + END！把錢花到 END（結束）就是 spend！花光了，END！😅💸",
+   conjugation:"spend → spent → spent → spending",
+   examples:[
+     {en:"I spent all my allowance on books.",zh:"我把所有零用錢都花在書上了。"},
+     {en:"We spent the weekend camping.",zh:"我們週末去露營。"}
+   ]},
+  // 🎯 動作事件
+  {no:16,en:"date",phonetic:"[det]",pos:"名/動",zh:"約會；日期；棗子；男女朋友",cat:"動作",
+   spell:"d + ate",
+   memory:"<b>DATE</b> 超多意思！約會、日期、棗子都叫 date！記住：What's the date today? 今天幾號？📅❤️",
+   examples:[
+     {en:"What is today's date?",zh:"今天是幾號？"},
+     {en:"They went on a date to the movies.",zh:"他們約會去看電影。"}
+   ]},
+  {no:17,en:"deal",phonetic:"[dil]",pos:"名/動",zh:"交易；處理",cat:"動作",
+   spell:"d + eal",
+   memory:"<b>DEAL</b> = D + EAL！Deal or No Deal（要不要？）！做一筆好 deal（交易）！Big deal 大事！🤝",
+   conjugation:"deal → dealt → dealt → dealing",
+   examples:[
+     {en:"We made a deal to share the homework.",zh:"我們達成協議輪流做作業。"},
+     {en:"It's a deal! I'll buy it.",zh:"成交！我買了。"}
+   ]},
+  {no:18,en:"present",phonetic:"[ˋprɛznt]",pos:"名/形",zh:"禮物；在場的；目前的",cat:"動作",
+   spell:"pre + sent",
+   memory:"<b>PRESENT</b> = PRE + SENT！在場（present）= 已送達（sent）！禮物（present）也是送去的！🎁",
+   examples:[
+     {en:"She gave me a birthday present.",zh:"她送給我一個生日禮物。"},
+     {en:"All students must be present for the exam.",zh:"所有學生必須出席考試。"}
+   ]},
+  {no:19,en:"handle",phonetic:"[ˋhændl]",pos:"動/名",zh:"處理；把手",cat:"動作",
+   spell:"hand + le",
+   memory:"<b>HANDLE</b> = HAND + LE！用手（HAND）抓住把手（handle）來處理事情！🖐️🚪",
+   conjugation:"handle → handled → handled → handling",
+   examples:[
+     {en:"Can you handle this problem by yourself?",zh:"你能自己處理這個問題嗎？"},
+     {en:"The handle of the bag is broken.",zh:"這個包包的把手壞了。"}
+   ]},
+  {no:20,en:"happen",phonetic:"[ˋhæpən]",pos:"動",zh:"發生；碰巧",cat:"動作",
+   spell:"hap + pen",
+   memory:"<b>HAPPEN</b> = HAP + PEN！不幸（hap）的事像用 PEN 寫下來一樣發生了！What happened? 發生什麼事了？⚡",
+   conjugation:"happen → happened → happened → happening",
+   examples:[
+     {en:"What happened to you?",zh:"你怎麼了？"},
+     {en:"It just happened that I was there.",zh:"我碰巧在那裡。"}
+   ]},
+  {no:21,en:"decide",phonetic:"[dɪˋsaɪd]",pos:"動",zh:"決定",cat:"動作",
+   spell:"de + cide",
+   memory:"<b>DECIDE</b> = DE + CIDE！DE 是分開，CIDE 像「死定了」= 決定就不能反悔！Make a decision! 🎯",
+   conjugation:"decide → decided → decided → deciding",
+   examples:[
+     {en:"Have you decided what to eat?",zh:"你決定吃什麼了嗎？"},
+     {en:"I can't decide between the two.",zh:"我無法在兩個之間做決定。"}
+   ]},
+  {no:22,en:"end",phonetic:"[ɛnd]",pos:"動/名",zh:"結束；結局；末端",cat:"動作",
+   spell:"e + n + d",
+   memory:"<b>END</b> = E + N + D！End 是結束，Begin 是開始！The end！電影結束時都會出現 THE END！🎬",
+   conjugation:"end → ended → ended → ending",
+   examples:[
+     {en:"The movie ends at ten o'clock.",zh:"電影十點結束。"},
+     {en:"We walked to the end of the street.",zh:"我們走到了街道的盡頭。"}
+   ]},
+  {no:23,en:"invite",phonetic:"[ɪnˋvaɪt]",pos:"動",zh:"邀請",cat:"動作",
+   spell:"in + vite",
+   memory:"<b>INVITE</b> = IN + VITE！邀請人進來（IN）！VITE 像「吃特」= 吃特別的東西，被邀請才能進！🎉",
+   conjugation:"invite → invited → invited → inviting",
+   examples:[
+     {en:"I invited all my classmates to my birthday party.",zh:"我邀請了所有同學來我的生日派對。"},
+     {en:"She was invited to sing at the concert.",zh:"她受邀在演唱會上演唱。"}
+   ]},
+  {no:24,en:"interview",phonetic:"[ˋɪntərˌvju]",pos:"名/動",zh:"訪問；面談；面試",cat:"動作",
+   spell:"inter + view",
+   memory:"<b>INTERVIEW</b> = INTER + VIEW！INTER（互相）+ VIEW（看）= 互相看對方！面試就是互相了解 👔",
+   conjugation:"interview → interviewed → interviewed → interviewing",
+   examples:[
+     {en:"She has a job interview tomorrow.",zh:"她明天有一場工作面試。"},
+     {en:"The reporter interviewed the famous singer.",zh:"記者採訪了那位著名歌手。"}
+   ]},
+  {no:25,en:"continue",phonetic:"[kənˋtɪnju]",pos:"動",zh:"繼續",cat:"動作",
+   spell:"con + tin + ue",
+   memory:"<b>CONTINUE</b> = CON + TIN + UE！TIN 是錫罐，一直滾不停 = continue（繼續）！To be continued... 待續 ▶️",
+   conjugation:"continue → continued → continued → continuing",
+   examples:[
+     {en:"Please continue reading from page ten.",zh:"請從第十頁繼續讀。"},
+     {en:"The rain continued all day.",zh:"雨下了一整天。"}
+   ]},
+  {no:26,en:"cancel",phonetic:"[ˋkænsl]",pos:"動",zh:"取消；放棄",cat:"動作",
+   spell:"can + cel",
+   memory:"<b>CANCEL</b> = CAN + CEL！CAN（可以）+ CEL（細胞）= 細胞可以取消複製！你能取消就取消！❌",
+   conjugation:"cancel → cancelled → cancelled → cancelling",
+   examples:[
+     {en:"The concert was cancelled because of the storm.",zh:"演唱會因為暴風雨而被取消了。"},
+     {en:"I need to cancel my appointment.",zh:"我需要取消我的預約。"}
+   ]},
+  {no:27,en:"finish",phonetic:"[ˋfɪnɪʃ]",pos:"動",zh:"完成；結束",cat:"動作",
+   spell:"fin + ish",
+   memory:"<b>FINISH</b> = FIN + ISH！FIN 是魚鰭，魚游到終點線就是 FINISH！完成了！🐟🏁",
+   conjugation:"finish → finished → finished → finishing",
+   examples:[
+     {en:"Did you finish your homework?",zh:"你作業做完了嗎？"},
+     {en:"She finished first in the race.",zh:"她在賽跑中第一個完成。"}
+   ]},
+  {no:28,en:"during",phonetic:"[ˋdjʊrɪŋ]",pos:"介",zh:"在…期間",cat:"動作",
+   spell:"dur + ing",
+   memory:"<b>DURING</b> = DUR + ING！DUR 聽起來像「都」 + ING = 在做的期間！during class（上課期間）🕐",
+   examples:[
+     {en:"Please be quiet during the test.",zh:"考試期間請保持安靜。"},
+     {en:"We had a lot of fun during the trip.",zh:"我們在旅途中玩得很開心。"}
+   ]},
+  {no:29,en:"with",phonetic:"[wɪð]",pos:"介",zh:"和…一起；帶著；用",cat:"動作",
+   spell:"w + ith",
+   memory:"<b>WITH</b> = W + ITH！WITH 是超常用介系詞！I am with you（我和你在一起）！永遠跟你在一起 ❤️",
+   examples:[
+     {en:"I go to school with my sister every day.",zh:"我每天和我妹妹一起去上學。"},
+     {en:"Cut the paper with scissors.",zh:"用剪刀剪紙。"}
+   ]},
+  {no:30,en:"without",phonetic:"[wɪðˋaʊt]",pos:"介",zh:"沒有；不帶",cat:"動作",
+   spell:"with + out",
+   memory:"<b>WITHOUT</b> = WITH + OUT！WITH（有）+ OUT（出去）= 沒有！I can't live without you! 沒有你我活不下去！💔",
+   examples:[
+     {en:"Don't leave without telling me.",zh:"沒告訴我就不要離開。"},
+     {en:"She went out without an umbrella and got wet.",zh:"她沒帶雨傘出門，結果全身濕透了。"}
+   ]},
+  // ⚖️ 法律犯罪
+  {no:31,en:"judge",phonetic:"[dʒʌdʒ]",pos:"名/動",zh:"法官；判斷",cat:"法律",
+   spell:"j + udge",
+   memory:"<b>JUDGE</b> = J + UDGE！法官（judge）用槌子敲桌「當！J了你！」也可以指「評斷」= Don't judge me! ⚖️",
+   conjugation:"judge → judged → judged → judging",
+   examples:[
+     {en:"The judge made a fair decision.",zh:"法官做出了公平的判決。"},
+     {en:"Don't judge a book by its cover.",zh:"不要以貌取人。"}
+   ]},
+  {no:32,en:"rob",phonetic:"[rɑb]",pos:"動",zh:"搶奪；搶劫",cat:"法律",
+   spell:"r + ob",
+   memory:"<b>ROB</b> = R + OB！ROB 也是英文名字！想像一個叫 ROB 的搶匪在搶劫！「ROB 在搶！」🚨",
+   conjugation:"rob → robbed → robbed → robbing",
+   examples:[
+     {en:"The man robbed the bank.",zh:"那個男人搶了銀行。"},
+     {en:"Someone robbed her of her bag.",zh:"有人搶走了她的包包。"}
+   ]},
+  {no:33,en:"thief",phonetic:"[θif]",pos:"名",zh:"小偷",cat:"法律",
+   spell:"th + ie + f",
+   memory:"<b>THIEF</b> = TH + IEF！複數是 thieves！TH 的發音像「斯」= 斯斯偷東西！Stop, thief! 抓小偷！🔐",
+   examples:[
+     {en:"The thief stole my wallet.",zh:"小偷偷走了我的錢包。"},
+     {en:"The police caught the thief.",zh:"警察抓到了小偷。"}
+   ]},
+  {no:34,en:"steal",phonetic:"[stil]",pos:"動",zh:"偷竊；偷",cat:"法律",
+   spell:"st + eal",
+   memory:"<b>STEAL</b> = ST + EAL！STEAL 偷竊，STEEL 鋼鐵（同音不同字）！小偷用鋼鐵手偷東西！🦹",
+   conjugation:"steal → stole → stolen → stealing",
+   examples:[
+     {en:"Someone stole my bicycle!",zh:"有人偷了我的腳踏車！"},
+     {en:"It is wrong to steal.",zh:"偷竊是不對的。"}
+   ]},
+  {no:35,en:"trouble",phonetic:"[ˋtrʌbl]",pos:"名/動",zh:"麻煩；使煩惱；困境",cat:"法律",
+   spell:"trou + ble",
+   memory:"<b>TROUBLE</b> = TROU + BLE！TROUBLE 就是麻煩！get into trouble（惹麻煩）！雙重的 bl 像雙重麻煩！😰",
+   conjugation:"trouble → troubled → troubled → troubling",
+   examples:[
+     {en:"He is always getting into trouble at school.",zh:"他在學校老是惹麻煩。"},
+     {en:"Sorry to trouble you, but can you help me?",zh:"抱歉打擾你，你可以幫我嗎？"}
+   ]},
+  {no:36,en:"terrible",phonetic:"[ˋtɛrəbl]",pos:"形",zh:"糟糕的；可怕的",cat:"法律",
+   spell:"terr + ible",
+   memory:"<b>TERRIBLE</b> = TERR + IBLE！TERROR（恐怖）+ IBLE = 可以讓人恐怖的事 = terrible！糟糕透頂！😱",
+   examples:[
+     {en:"The weather is terrible today.",zh:"今天天氣真糟糕。"},
+     {en:"I had a terrible nightmare last night.",zh:"我昨晚做了一個可怕的噩夢。"}
+   ]},
+  {no:37,en:"true",phonetic:"[tru]",pos:"形",zh:"真實的；符合事實的",cat:"法律",
+   spell:"tr + ue",
+   memory:"<b>TRUE</b> = TR + UE！True or false？是真是假？TRUE = 真！真愛是 true love！Come true 夢想成真！💫",
+   examples:[
+     {en:"Is it true that you're moving away?",zh:"你真的要搬走了嗎？"},
+     {en:"Her dream finally came true.",zh:"她的夢想終於實現了。"}
+   ]},
+  {no:38,en:"fact",phonetic:"[fækt]",pos:"名",zh:"事實；真相",cat:"法律",
+   spell:"f + act",
+   memory:"<b>FACT</b> = F + ACT！FACT（事實）就是真實發生的 ACT（行動）！In fact... 事實上 📋",
+   examples:[
+     {en:"Is that a fact or just your opinion?",zh:"那是事實還是你的意見？"},
+     {en:"In fact, I've never been to Japan.",zh:"事實上，我從來沒去過日本。"}
+   ]},
+  {no:39,en:"excuse",phonetic:"[ɪkˋskjuz]",pos:"動/名",zh:"原諒；藉口",cat:"法律",
+   spell:"ex + cuse",
+   memory:"<b>EXCUSE</b> = EX + CUSE！EX（前任）找 CUSE（藉口）說抱歉！Excuse me 打擾一下！No excuse! 沒有藉口！🙅",
+   conjugation:"excuse → excused → excused → excusing",
+   examples:[
+     {en:"Excuse me, where is the bathroom?",zh:"打擾一下，洗手間在哪裡？"},
+     {en:"There is no excuse for being late.",zh:"遲到沒有任何藉口。"}
+   ]},
+  // 🌟 生活情境
+  {no:40,en:"alone",phonetic:"[əˋlon]",pos:"形/副",zh:"獨自的；單獨地",cat:"生活",
+   spell:"a + lone",
+   memory:"<b>ALONE</b> = A + LONE！LONE 是孤單的，A LONE（一個孤單）= alone！Leave me alone! 別煩我！🙍",
+   examples:[
+     {en:"She lives alone in a small apartment.",zh:"她一個人住在一個小公寓裡。"},
+     {en:"Are you alone? Can I sit here?",zh:"你一個人嗎？我可以坐這嗎？"}
+   ]},
+  {no:41,en:"together",phonetic:"[təˋgɛðər]",pos:"副",zh:"一起；共同",cat:"生活",
+   spell:"to + get + her",
+   memory:"<b>TOGETHER</b> = TO + GET + HER！去（TO）得到（GET）她（HER）= 兩人在一起！We are together! 💑",
+   examples:[
+     {en:"Let's go to the park together.",zh:"我們一起去公園吧。"},
+     {en:"We put the puzzle together.",zh:"我們一起拼好了拼圖。"}
+   ]},
+  {no:42,en:"seat",phonetic:"[sit]",pos:"名/動",zh:"座位；使就坐",cat:"生活",
+   spell:"s + eat",
+   memory:"<b>SEAT</b> = S + EAT！坐下來（SEAT）吃東西（EAT）！S 加 EAT = SEAT！Please be seated! 請就坐 🪑",
+   examples:[
+     {en:"Please take a seat.",zh:"請坐下。"},
+     {en:"Is this seat taken?",zh:"這個位子有人坐嗎？"}
+   ]},
+  {no:43,en:"heat",phonetic:"[hit]",pos:"名/動",zh:"炎熱；加熱",cat:"生活",
+   spell:"h + eat",
+   memory:"<b>HEAT</b> = H + EAT！熱讓人 H-EAT（吃很多）！夏天的 heat（炎熱）讓人想吃冰淇淋！🌡️🍦",
+   conjugation:"heat → heated → heated → heating",
+   examples:[
+     {en:"The heat today is unbearable.",zh:"今天的炎熱讓人難以忍受。"},
+     {en:"Please heat up the soup before eating.",zh:"吃之前請先把湯加熱。"}
+   ]},
+  {no:44,en:"smoke",phonetic:"[smok]",pos:"名/動",zh:"煙霧；抽煙",cat:"生活",
+   spell:"sm + oke",
+   memory:"<b>SMOKE</b> = SM + OKE！OKE 聽起來像「喔可」，抽菸「喔可不行！」= 抽煙對身體不好！🚭",
+   conjugation:"smoke → smoked → smoked → smoking",
+   examples:[
+     {en:"Smoking is not allowed in this area.",zh:"這個區域禁止吸煙。"},
+     {en:"Where there is smoke, there is fire.",zh:"有煙就有火（無風不起浪）。"}
+   ]},
+  {no:45,en:"crowded",phonetic:"[ˋkraʊdɪd]",pos:"形",zh:"擁擠的",cat:"生活",
+   spell:"crowd + ed",
+   memory:"<b>CROWDED</b> = CROWD + ED！CROWD（人群）+ ED = 充滿人群的！捷運很 crowded！人擠人！🚇👥",
+   examples:[
+     {en:"The bus was so crowded that I couldn't get on.",zh:"公車太擁擠了，我根本上不去。"},
+     {en:"The night market is always crowded on weekends.",zh:"夜市週末總是很擁擠。"}
+   ]}
+];
+
+// ===== STATE =====
+const learnt = new Set();
+let currentCat = 'all';
+let searchTerm = '';
+let fcVocab = [...vocab];
+let fcIndex = 0;
+let quizQuestions = [];
+let quizCurrent = 0;
+let qCorrectCount = 0;
+let qWrongCount = 0;
+const TOTAL_QUIZ = 10;
+
+// ===== TABS =====
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-'+tab).classList.add('active');
+  const tabs = ['browse','flashcard','quiz','progress'];
+  document.querySelectorAll('.tab-btn')[tabs.indexOf(tab)].classList.add('active');
+  if (tab === 'quiz') startQuiz();
+  if (tab === 'progress') renderProgress();
+  if (tab === 'flashcard') renderFC();
+}
+
+// ===== SPEAK =====
+function speakWord(word) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(word);
+  u.lang = 'en-US'; u.rate = 0.85; u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+  const btns = document.querySelectorAll('.speak-btn');
+  btns.forEach(b => {
+    if (b.getAttribute('data-word') === word) {
+      b.classList.add('speaking');
+      u.onend = () => b.classList.remove('speaking');
+    }
+  });
+}
+
+// ===== RENDER VOCAB =====
+function renderVocab() {
+  const grid = document.getElementById('vocabGrid');
+  const noResult = document.getElementById('noResult');
+  let filtered = vocab.filter(v => {
+    const matchCat = currentCat === 'all' || v.cat === currentCat;
+    const matchSearch = !searchTerm ||
+      v.en.toLowerCase().includes(searchTerm) ||
+      v.zh.includes(searchTerm);
+    return matchCat && matchSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    noResult.style.display = 'block';
+    return;
+  }
+  noResult.style.display = 'none';
+
+  // Group by category
+  const cats = ['金錢','動作','法律','生活'];
+  const catEmoji = {'金錢':'💰 金錢消費','動作':'🎯 動作事件','法律':'⚖️ 法律犯罪','生活':'🌟 生活情境'};
+  let html = '';
+  let lastCat = '';
+
+  filtered.forEach(v => {
+    const isLearnt = learnt.has(v.no);
+    const hasCj = v.conjugation ? true : false;
+    if (v.cat !== lastCat && currentCat === 'all') {
+      html += '<div class="cat-group-title">' + (catEmoji[v.cat]||v.cat) + '</div>';
+      lastCat = v.cat;
+    }
+    html += '<div class="vocab-card" id="card-'+v.no+'">';
+    html += '<div class="card-header">';
+    html += '<div class="card-main">';
+    html += '<div class="word-num">No. '+v.no+'</div>';
+    html += '<div class="word-en">'+v.en+'</div>';
+    html += '<div class="word-phonetic">'+v.phonetic+'</div>';
+    html += '<div class="word-pos-zh"><span class="pos-tag">'+v.pos+'</span></div>';
+    html += '<div class="word-zh">'+v.zh+'</div>';
+    html += '</div>';
+    html += '<button class="speak-btn" data-word="'+v.en+'" onclick="event.stopPropagation();speakWord(\''+v.en+'\')">🔊</button>';
+    html += '</div>';
+    html += '<div class="spell-tip"><span class="spell-emoji">✏️</span> 拼字技巧：<b>'+v.spell+'</b></div>';
+    html += '<div class="memory-trick">🧠 <b>超強記憶法：</b>'+v.memory+'</div>';
+    if (hasCj) {
+      html += '<div class="card-details">';
+      html += '<div class="conjugation">🔤 變化形式：'+v.conjugation+'</div>';
+    } else {
+      html += '<div class="card-details hidden">';
+    }
+    html += '<div class="examples">';
+    v.examples.forEach(ex => {
+      html += '<div class="example-item">';
+      html += '<div class="example-en">📝 '+ex.en+'</div>';
+      html += '<div class="example-zh">'+ex.zh+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    if (!hasCj) {
+      html += '<button class="expand-btn" onclick="toggleDetails('+v.no+',this)">▼ 查看例句與記憶法</button>';
+    }
+    html += '<button class="learnt-btn'+(isLearnt?' learnt':'')+'" id="learnt-'+v.no+'" onclick="toggleLearnt('+v.no+',this)">';
+    html += isLearnt ? '⭐ 已學會' : '☆ 標記學會';
+    html += '</button>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+}
+
+function toggleDetails(no, btn) {
+  const card = document.getElementById('card-'+no);
+  const details = card.querySelector('.card-details');
+  if (details.classList.contains('hidden')) {
+    details.classList.remove('hidden');
+    btn.textContent = '▲ 收起';
+  } else {
+    details.classList.add('hidden');
+    btn.textContent = '▼ 查看例句與記憶法';
+  }
+}
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderVocab();
+}
+
+function filterCards() {
+  searchTerm = document.getElementById('searchBar').value.toLowerCase().trim();
+  renderVocab();
+}
+
+// ===== LEARNT =====
+function toggleLearnt(no, btn) {
+  if (learnt.has(no)) {
+    learnt.delete(no);
+    btn.innerHTML = '☆ 標記學會';
+    btn.classList.remove('learnt');
+  } else {
+    learnt.add(no);
+    btn.innerHTML = '⭐ 已學會';
+    btn.classList.add('learnt');
+    btn.classList.add('star-pop');
+    setTimeout(() => btn.classList.remove('star-pop'), 400);
+  }
+  updateLearntCount();
+  renderProgress();
+}
+
+function updateLearntCount() {
+  document.getElementById('learntCount').textContent = '⭐ 已學 '+learnt.size+' 個';
+  document.getElementById('ovLearnt').textContent = learnt.size;
+  document.getElementById('ovLeft').textContent = vocab.length - learnt.size;
+}
+
+// ===== FLASHCARD =====
+function renderFC() {
+  if (fcVocab.length === 0) return;
+  const v = fcVocab[fcIndex];
+  document.getElementById('fcWord').textContent = v.en;
+  document.getElementById('fcPhonetic').textContent = v.phonetic;
+  document.getElementById('fcZh').textContent = v.zh;
+  document.getElementById('fcPos').textContent = v.pos;
+  const exEl = document.getElementById('fcEx');
+  if (v.examples && v.examples.length > 0) {
+    exEl.innerHTML = '📝 '+v.examples[0].en+'<br><span style="color:#888;font-size:0.78rem">'+v.examples[0].zh+'</span>';
+  } else { exEl.textContent = ''; }
+  document.getElementById('fcProgress').style.width = ((fcIndex+1)/fcVocab.length*100)+'%';
+  document.getElementById('fcCounter').textContent = '第 '+(fcIndex+1)+' / '+fcVocab.length+' 張';
+  document.getElementById('flashcardInner').classList.remove('flipped');
+}
+
+function flipCard() { document.getElementById('flashcardInner').classList.toggle('flipped'); }
+
+function fcNav(dir) {
+  fcIndex = (fcIndex + dir + fcVocab.length) % fcVocab.length;
+  renderFC();
+}
+
+function shuffleFC() {
+  for (let i = fcVocab.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [fcVocab[i],fcVocab[j]] = [fcVocab[j],fcVocab[i]];
+  }
+  fcIndex = 0; renderFC();
+}
+
+function fcFilter(type) {
+  if (type === 'all') { fcVocab = [...vocab]; }
+  else { fcVocab = vocab.filter(v => !learnt.has(v.no)); }
+  if (fcVocab.length === 0) fcVocab = [...vocab];
+  fcIndex = 0; renderFC();
+}
+
+// ===== QUIZ =====
+function getRandItems(arr, n, exclude) {
+  const pool = arr.filter(v => v.no !== exclude);
+  const shuffled = [...pool].sort(() => Math.random()-0.5);
+  return shuffled.slice(0, n);
+}
+
+function startQuiz() {
+  qCorrectCount = 0; qWrongCount = 0; quizCurrent = 0;
+  document.getElementById('qCorrect').textContent = '0';
+  document.getElementById('qWrong').textContent = '0';
+  document.getElementById('quizResult').classList.remove('show');
+  document.getElementById('quizCard').style.display = 'block';
+  const shuffled = [...vocab].sort(() => Math.random()-0.5).slice(0, TOTAL_QUIZ);
+  quizQuestions = shuffled.map(v => {
+    const types = ['en2zh','zh2en','fill'];
+    const type = types[Math.floor(Math.random()*types.length)];
+    return { v, type };
+  });
+  renderQuestion();
+}
+
+function renderQuestion() {
+  if (quizCurrent >= quizQuestions.length) { showResult(); return; }
+  const {v, type} = quizQuestions[quizCurrent];
+  document.getElementById('qNum').textContent = '第 '+(quizCurrent+1)+' 題 / 共'+TOTAL_QUIZ+'題';
+  document.getElementById('qFeedback').className = 'quiz-feedback';
+  document.getElementById('qFeedback').innerHTML = '';
+  document.getElementById('qNextBtn').className = 'quiz-next-btn';
+  const badge = document.getElementById('qTypeBadge');
+  const optDiv = document.getElementById('qOptions');
+  const qDiv = document.getElementById('qQuestion');
+
+  if (type === 'en2zh') {
+    badge.style.background = '#BBE0FB'; badge.style.color = '#1565C0';
+    badge.textContent = '英翻中';
+    qDiv.innerHTML = '單字 <b style="color:#42A5F5;font-size:1.4rem">'+v.en+'</b> 的中文意思是？';
+    const wrongs = getRandItems(vocab, 3, v.no);
+    const opts = [...wrongs.map(w=>w.zh), v.zh].sort(() => Math.random()-0.5);
+    optDiv.innerHTML = '';
+    optDiv.style.gridTemplateColumns = '1fr 1fr';
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt'; btn.textContent = opt;
+      btn.onclick = () => checkAnswer(btn, opt, v.zh, v, type);
+      optDiv.appendChild(btn);
+    });
+  } else if (type === 'zh2en') {
+    badge.style.background = '#C8E6C9'; badge.style.color = '#2E7D32';
+    badge.textContent = '中翻英';
+    qDiv.innerHTML = '「<b style="color:#26A69A;font-size:1.3rem">'+v.zh+'</b>」的英文單字是？';
+    const wrongs = getRandItems(vocab, 3, v.no);
+    const opts = [...wrongs.map(w=>w.en), v.en].sort(() => Math.random()-0.5);
+    optDiv.innerHTML = '';
+    optDiv.style.gridTemplateColumns = '1fr 1fr';
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt'; btn.textContent = opt;
+      btn.onclick = () => checkAnswer(btn, opt, v.en, v, type);
+      optDiv.appendChild(btn);
+    });
+  } else {
+    badge.style.background = '#F8BBD0'; badge.style.color = '#880E4F';
+    badge.textContent = '填空題';
+    const ex = v.examples[0];
+    const blank = ex.en.replace(new RegExp('\\b'+v.en+'\\b','gi'), '___');
+    qDiv.innerHTML = '填入正確的單字：<br><span class="quiz-sentence">'+blank+'</span><br><small style="color:#888;margin-top:4px;display:block">'+ex.zh+'</small>';
+    optDiv.innerHTML = '<input type="text" class="fill-input" id="fillInput" placeholder="輸入英文單字..." onkeypress="if(event.key===\'Enter\')checkFill(\''+v.en+'\')">';
+    optDiv.style.gridTemplateColumns = '1fr';
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'fc-btn next'; submitBtn.textContent = '確認答案 ✓';
+    submitBtn.style.cssText = 'margin-top:10px;width:100%;padding:12px;font-size:0.95rem;';
+    submitBtn.onclick = () => checkFill(v.en, v);
+    optDiv.appendChild(submitBtn);
+  }
+}
+
+function checkFill(correct, v) {
+  const input = document.getElementById('fillInput');
+  const ans = input ? input.value.trim().toLowerCase() : '';
+  const isCorrect = ans === correct.toLowerCase();
+  if (input) {
+    input.disabled = true;
+    input.classList.add(isCorrect ? 'correct-ans' : 'wrong-ans');
+  }
+  showFeedback(isCorrect, correct, v);
+}
+
+function checkAnswer(btn, chosen, correct, v, type) {
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct-ans');
+    else if (b === btn && chosen !== correct) b.classList.add('wrong-ans');
+  });
+  showFeedback(chosen === correct, correct, v);
+}
+
+function showFeedback(isCorrect, correct, v) {
+  if (isCorrect) { qCorrectCount++; document.getElementById('qCorrect').textContent = qCorrectCount; }
+  else { qWrongCount++; document.getElementById('qWrong').textContent = qWrongCount; }
+  const fb = document.getElementById('qFeedback');
+  if (isCorrect) {
+    fb.className = 'quiz-feedback show correct-fb';
+    fb.innerHTML = '🎉 答對了！<b>'+v.en+'</b> = '+v.zh+'<br>📝 '+v.examples[0].en;
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = '💡 正確答案是：<b>'+correct+'</b><br>🧠 記憶法：'+v.memory.replace(/<[^>]*>/g,'');
+  }
+  speakWord(v.en);
+  document.getElementById('qNextBtn').className = 'quiz-next-btn show';
+}
+
+function nextQuestion() {
+  quizCurrent++;
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quizCard').style.display = 'none';
+  const resultDiv = document.getElementById('quizResult');
+  resultDiv.classList.add('show');
+  const pct = Math.round(qCorrectCount/TOTAL_QUIZ*100);
+  let emoji, cls, msg;
+  if (pct >= 90) { emoji='🏆'; cls='great'; msg='太厲害了！你是英語小天才！'; }
+  else if (pct >= 70) { emoji='🌟'; cls='good'; msg='很棒！再練習就更完美了！'; }
+  else if (pct >= 50) { emoji='😊'; cls='ok'; msg='不錯！繼續努力加油！'; }
+  else { emoji='💪'; cls='ok'; msg='不要灰心，再試一次就會進步！'; }
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultScore').textContent = pct+'分 ('+qCorrectCount+'/'+TOTAL_QUIZ+')';
+  document.getElementById('resultScore').className = 'result-score '+cls;
+  document.getElementById('resultMsg').textContent = msg;
+  const prev = localStorage.getItem('u28_highscore')||0;
+  if (pct > prev) {
+    localStorage.setItem('u28_highscore', pct);
+    document.getElementById('quizHighScore').textContent = '🏆 最高分 '+pct+'分';
+  }
+}
+
+// ===== PROGRESS =====
+function renderProgress() {
+  const list = document.getElementById('reviewList');
+  document.getElementById('ovLearnt').textContent = learnt.size;
+  document.getElementById('ovLeft').textContent = vocab.length - learnt.size;
+  let html = '';
+  vocab.forEach(v => {
+    const isL = learnt.has(v.no);
+    html += '<div class="review-item">';
+    html += '<div class="ri-word">'+v.en+'</div>';
+    html += '<div class="ri-zh">'+v.zh+'</div>';
+    html += '<div class="ri-status">'+(isL?'⭐':'📖')+'</div>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function clearLearnt() {
+  if (!confirm('確定要清除所有學習紀錄嗎？')) return;
+  learnt.clear();
+  document.querySelectorAll('.learnt-btn').forEach(b => {
+    b.innerHTML = '☆ 標記學會';
+    b.classList.remove('learnt');
+  });
+  updateLearntCount();
+  renderProgress();
+}
+
+// ===== INIT =====
+window.onload = function() {
+  renderVocab();
+  fcVocab = [...vocab];
+  renderFC();
+  const hs = localStorage.getItem('u28_highscore');
+  if (hs) document.getElementById('quizHighScore').textContent = '🏆 最高分 '+hs+'分';
+};
+</script>
+</body>
+</html>
